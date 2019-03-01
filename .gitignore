@@ -199,3 +199,7 @@ TSWLatexianTemp*
 .project
 /backup/
 /rasha19iros.pdf
+pics/original/
+pics/output_system_overview_large.pdf
+pics/output_system_overview_old.pdf
+pics/unsupervised/masks_8mm_fromImages_frame796_GroundTruth_iMap.png

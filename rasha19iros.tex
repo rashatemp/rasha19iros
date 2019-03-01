@@ -36,7 +36,7 @@
 %%\usepackage{flushend}
 
 %% Style hacks to save space
-\setlength{\textfloatsep}{1.95em}
+%\setlength{\textfloatsep}{1.95em}
 %\setlength{\dbltextfloatsep}{1.1em}
 %\usepackage[font=small]{caption}
 
@@ -82,7 +82,7 @@ of semantic segmentation with the goal of reducing the  human labeling effort.
 Our target application is agricultural robotics and we focus on the task of
 distinguishing between crop and weed plants from image data. A key challenge in this
 application is the  transfer of an existing semantic segmentation CNN to a new
-field. We propose a novel a approach that, given a trained model on one field,
+field. We propose a novel approach that, given a trained model on one field,
 refines the network on a substantially different field  providing an effective
 method of selecting samples to annotate for supporting the transfer. Our
 method takes into account the influence of the so far unlabeled samples on the
@@ -99,7 +99,7 @@ approach reduces the required human labeling  effort.
 \section{INTRODUCTION}
 \label{sec:intro}
 
-The ability to semantically interpret the scene in front of a robot is key for
+The ability to  interpret the scene in front of a robot is key for
 intelligent behavior in several applications. For example, precision farming
 robots need to know which type of plant they perceive or autonomous cars need to
 know  which object in their surroundings is a car, a pedestrian, or a
@@ -151,15 +151,16 @@ these training samples will have on the weight gradients of the CNN. Our
 strategy is based  on the observation that given a trained model and unseen
 samples from  a different domain, the samples that the network performs most
 poorly on, especially at the  beginning, will have the largest weight
-gradients and consequently the largest impact on the  weights.   Our approach
+gradients and consequently the largest impact on the  weights. This strategy might appear to be circular, since computing gradients already requires class labels at a stage where are still selecting images for labeling.  We circumvent this by using pseudo ground truth that we obtain with very weakly supervised segmentation. Our approach
 selects samples in batches, each time refining the network, then computing a
 new  ranking of the unlabeled data. The best samples are then selected and the
-network is re-trained. To compute the gradients, corresponding ground
-truth data is needed. In our approach, we treat the result of unsupervised  segmentation as ground truth.  We
-implemented and evaluated our framework on  agricultural datasets~\cite{chebrolu2017agricultural} 
+network is re-trained. To compute the real gradients, corresponding ground
+truth data is needed. Thus, in our approach, we approximate the ground truth as the result of unsupervised segmentation to estimate the gradient.  We
+evaluated our framework on  agricultural datasets~\cite{chebrolu2017agricultural} 
 with different characteristics.  Our results indicate that our method produces a
 higher accuracy on the datasets with a fewer  number of samples compared to
 random sampling for annotation as well as uncertainty-based approaches.
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -196,7 +197,7 @@ The Expected Model Output Change Principle (EMOC) developed by Freytag~\etal~\ci
 
 In the context of self-learning, Zhang~\etal~\cite{zhang2018self} use labels obtained with K-means graph cuts as ground truth for their network. The predictions produced by the model are then used as the target labels for the next iteration of the process.  
 
-Different to these works, we experiment with approaches that directly measure how annotated samples can affect the gradients. We use labels obtained with unsupervised segmentation as pseudo ground truth and compute the gradients w.r.t the weights. We then refine a pre-trained network with the newly annotated samples in an iterative manner. 
+Different to these works, we experiment with approaches that directly measure how annotated samples can affect the gradients. We use labels obtained with very weak supervision as pseudo ground truth and compute the gradients w.r.t the weights. We then refine a pre-trained network with the newly annotated samples in an iterative manner. 
 
 
 
@@ -205,10 +206,9 @@ Different to these works, we experiment with approaches that directly measure ho
 
 
     \begin{figure*}
-%	\vspace{1em} 
     \centering
     \includegraphics[scale=0.9]{pics/output_system_overview.pdf}
-   		\caption{Overview figure of our system. We first perform unsupervised segmentation to obtain pseudo ground truth. Given the labels and different measures produced by the network, we rank the unlabeled samples and pick them accordingly for annotation. These are then used to refine the network.}
+   		\caption{Overview figure of our system. We first perform very weakly supervised segmentation to obtain pseudo ground truth. Given the labels and different measures produced by the network, we rank the unlabeled samples and pick them accordingly for annotation. These are then used to refine the network.}
 		\label{fig:overview}    		
 %    \vspace{1em}
    \end{figure*}
@@ -259,14 +259,16 @@ We then sort the images based on the computed uncertainty measure and pick the i
 
 \subsection{Loss} \label{sec:loss}
 
-The loss of the network is an indication of the segmentation error and given that the gradients w.r.t the network weights are driven by the loss, it provides a useful cue as to which samples the network will most benefit from. We first use unsupervised segmentation to produce pseudo-ground truth for the images. We then run the network on all the images and compute the loss with these labels as ground truth. The images are sorted based on this loss and again chosen on a log-space scale. We note that the pseudo-ground truth is only used to compute the loss but the network weights remain unchanged. They are only later updated with the manual annotations of the selected samples.
+The loss of the network is an indication of the segmentation error. Given that training neural networks with backpropagation is driven by the loss, it also provides a useful cue as to which samples the network will most benefit from. We compute the loss based on a pseudo-ground truth, consisting of a foreground-background segmentation that we achieve using k-means clustering on the RGB channels.
 
-For unsupervised segmentation, we only do foreground-background segmentation. In the train phase, we run k-means clustering on the RGB channels of 10 random samples of the new dataset to learn 20 clusters. The annotator can then look at a single image and choose those clusters that separate vegetation from soil. In our experiments, two clusters were enough. The rest of the images can then be annotated using those clusters. 
+Initially, we use k-means to determine 20 cluster representatives from 10 randomly selected images. After viewing a single image that contains all 20 clusters, a human annotator chooses which clusters represent vegetation. In our experiments, it was enough to select two clusters. In accordance with previously used terminology \cite{zhang2018self}, we refer to this step as being very weakly supervised, since it only involves inspecting a single image. 
+
+Pseudo ground truth is generated for all unlabeled images by assigning pixels to the selected clusters, and the loss is computed with respect to it. The images are sorted based on this loss and again chosen on a log-space scale. We note that the pseudo ground truth is only used to compute the loss but the network weights remain unchanged. They are only later updated with the manual annotations of the selected samples.
 
 
 \subsection{Norm of Gradients} \label{sec:grad_norm}
 
-For this approach and the following one, we pick those samples for annotation that might have the largest impact on the network weights. The norm of the network gradients is a measure that is indicative of which samples will affect the weights more than others. As in the previous approach, we use labels from unsupervised segmentation as pseudo-ground truth. We run the network on the training images for one epoch and compute the gradients. Again we note that this step is only used to compute the gradients but we don't change the network weights. Once we have the gradients, we compute the $L_2$ norm of those in the last layer of the network (the classifier layer).
+For this approach and the following one, we pick those samples for annotation that might have the largest impact on the network weights. The norm of the network gradients is a measure that is indicative of which samples will affect the weights more than others. As in the previous approach, we use labels from very weakly supervised segmentation as pseudo ground truth. We run the network on the training images for one epoch and compute the gradients. Again we note that this step is only used to compute the gradients but we don't change the network weights. Once we have the gradients, we compute the $L_2$ norm of those in the last two layers of the network (the classifier layer and the one immediately before it).
 \begin{align}
 n_g(\bold{x}) &=  \left\lVert \nabla_{w_f} \mathcal{L}(\bold{x}) \right\rVert,
 \end{align}  
@@ -278,9 +280,9 @@ The images are sorted based on this measure and we pick samples on a log-space s
 
 The log-space in the previous approaches was used to ensure there is enough diversity among the samples so that the network does not overfit on them and can generalize to unseen data. Here we use a different method that relies on the space spanned by the gradients where we project onto the orthogonal complement of the gradients of the selected samples. For every sample picked we project the gradients of all remaining samples onto the selected sample gradient. We then subtract the projected gradient from the original gradients. The residual we are left with indicates which samples have the strongest remaining effect on the weights after accounting for the already selected samples. This can be formulated as:
 \begin{align}
-n_p(\bold{x}) &=  \left\lVert \bold{g_x} - \sum_{i=1}^S \frac{\left\langle \bold{g_s}, \bold{g_x} \right\rangle}{\left\langle \bold{g_s}, \bold{g_s} \right\rangle} \bold{g_s} \right\rVert,
+n_p(\bold{x}) &=  \left\lVert \bold{g_x} - \sum_{i=1}^S \frac{\left\langle \bold{g_i}, \bold{g_x} \right\rangle}{\left\langle \bold{g_i}, \bold{g_i} \right\rangle} \bold{g_i} \right\rVert,
 \end{align}
-where $g_s$ is the gradient of the previously selected sample, and $g_x$ is the gradient of the current sample.
+where $\bold{g_i}$ is the gradient of the $i$th out of $S$ previously selected samples, and $\bold{g_x}$ is the gradient of the current sample.
 
 We select samples one by one, each time sorting them according to this measure and choosing the one with the highest norm of the residual. To pick the first sample, we choose that with the highest norm of the gradient.
 
@@ -296,7 +298,7 @@ We show in this section the effectiveness of the approaches we designed for acti
 
 \subsection{Datasets}
 
-The datasets we used were acquired with a Bosch Deepfield Robotics BoniRob UGV in three different fields: Bonn and Stuttgart in Germany, and Zurich in Switzerland. The datasets have weed and crop plants at different stages of growth. Figure \ref{fig:datasets_images} shows sample images from the different datasets. The images vary in their illumination, soil type, and classes statistics, hence the need for transfer learning. The images have been annotated into three classes: soil, weed and crop.The Bonn dataset is partly publicly available \cite{chebrolu2017agricultural}. Table \ref{tab:datasets_stats} shows the number of images in each dataset and the ratio of foreground pixels. It can be clearly seen that there is a high imbalance of classes in the data.
+The datasets we used were acquired with a Bosch Deepfield Robotics BoniRob UGV in three different fields: Bonn and Stuttgart in Germany, and Zurich in Switzerland. The datasets have weed and crop plants at different stages of growth. Figure \ref{fig:datasets_images} shows sample images from the different datasets. The images vary in their illumination, soil type, and class statistics, hence the need for transfer learning. The images have been annotated into three classes: soil, weed and crop. The Bonn dataset is partly publicly available \cite{chebrolu2017agricultural}. Table \ref{tab:datasets_stats} shows the number of images in each dataset and the ratio of foreground pixels. It can be clearly seen that there is a high imbalance of classes in the data.
 
 
 
@@ -319,43 +321,36 @@ The datasets we used were acquired with a Bosch Deepfield Robotics BoniRob UGV i
     
     
     \begin{figure}
-	\vspace{1em} 
     \centering
      \begin{subfigure}[b]{0.49\linewidth}
     \includegraphics[width=\linewidth]{pics/bonn/images/bonirob_2016-04-28-12-20-29_6_frame217.png}
    		\caption{}
 		\label{bonn_img}    		
-    \vspace{1em}
    \end{subfigure}
         \begin{subfigure}[b]{0.49\linewidth}
     \includegraphics[width=\linewidth]{pics/bonn/annotations/bonirob_2016-04-28-12-20-29_6_frame217.png}
    		\caption{}
 		\label{bonn_lbl}    		
-    \vspace{1em}
    \end{subfigure}
         \begin{subfigure}[b]{0.49\linewidth}
     \includegraphics[width=\linewidth]{pics/stuttgart/images/masks_8mm_fromImages_frame479.png}
    		\caption{}
 		\label{stuttgart_img}    		
-    \vspace{1em}
    \end{subfigure}
         \begin{subfigure}[b]{0.49\linewidth}
     \includegraphics[width=\linewidth]{pics/stuttgart/annotations/masks_8mm_fromImages_frame479_GroundTruth_iMap.png}
    		\caption{}
 		\label{stuttgart_lbl}    		
-    \vspace{1em}
    \end{subfigure}
         \begin{subfigure}[b]{0.49\linewidth}
     \includegraphics[width=\linewidth]{pics/zurich/images/bonirob_2016-10-13-09-03-00_0_frame66.png}
    		\caption{}
 		\label{zurich_img}    		
-    \vspace{1em}
    \end{subfigure}
         \begin{subfigure}[b]{0.49\linewidth}
     \includegraphics[width=\linewidth]{pics/zurich/annotations/bonirob_2016-10-13-09-03-00_0_frame66.png}
    		\caption{}
 		\label{zurich_lbl}    		
-    \vspace{1em}
    \end{subfigure}
     \caption{Sample images from the Bonn, Stuttgart, and Zurich datasets in the first, second, and third row respectively. The first column shows the RGB images and the second column shows their annotations. Green denotes crop while red denoted weed.}
     \label{fig:datasets_images}
@@ -365,25 +360,21 @@ The datasets we used were acquired with a Bosch Deepfield Robotics BoniRob UGV i
 
     
     \begin{figure}
-	\vspace{1em} 
     \centering
-     \begin{subfigure}[b]{0.49\linewidth}
+     \begin{subfigure}[b]{0.31\linewidth}
     \includegraphics[width=\linewidth]{pics/unsupervised/img_masks_8mm_fromImages_frame256.png}
-   		\caption{}
+   		\caption{input}
 		\label{unsup_img}    		
-    \vspace{1em}
    \end{subfigure}
-        \begin{subfigure}[b]{0.49\linewidth}
+        \begin{subfigure}[b]{0.31\linewidth}
     \includegraphics[width=\linewidth]{pics/unsupervised/gt_masks_8mm_fromImages_frame256_GroundTruth_iMap.png}
-   		\caption{}
+   		\caption{ground truth}
 		\label{unsup_gt}    		
-    \vspace{1em}
    \end{subfigure}
-      \begin{subfigure}[b]{0.49\linewidth}
+      \begin{subfigure}[b]{0.31\linewidth}
     \includegraphics[width=\linewidth]{pics/unsupervised/lbl_masks_8mm_fromImages_frame256.png}
-   		\caption{}
+   		\caption{segmentation mask}
 		\label{unsup_lbl}    		
-    \vspace{1em}
    \end{subfigure}
     \caption{Foreground segmentation of vegetation. Note that only a rough segmentation is enough for our approach.}
     \label{fig:unsupervised_foreground}
@@ -394,7 +385,7 @@ The datasets we used were acquired with a Bosch Deepfield Robotics BoniRob UGV i
 
 We evaluate our different approaches by first training a network on the Bonn dataset then refining it on the Stuttgart and Zurich datasets. To refine the network we pick unlabeled samples in batches of 10 using one of the methods described in Section \ref{sec:approach}. Once they are annotated, they are presented to the network. We repeat this process iteratively, each time refining the network on all of the newly annotated samples. 
 
-For the methods presented in sections \ref{sec:loss}, \ref{sec:grad_norm}, and \ref{sec:grad_proj}, we first obtain foreground masks with unsupervised segmentation. Figure  \ref{fig:unsupervised_foreground} shows an image, its ground truth and the foreground segmentation provided by clustering. Note that a rough segmentation is enough to be useful for these approaches.
+For the methods presented in sections \ref{sec:loss}, \ref{sec:grad_norm}, and \ref{sec:grad_proj}, we first obtain foreground masks with very weak supervision. Figure  \ref{fig:unsupervised_foreground} shows an image, its ground truth and the foreground segmentation provided by clustering. It is an important finding from our experiments that a rough segmentation is sufficient for the purpose of selecting images for annotation. This makes our proposed gradient-based approach feasible in practice.
 
 We follow the approach of \cite{milioto2018real} and split the new dataset into three sets: 40\% for training, 10\% for validation, and 50\% for testing. The samples are picked from the training set. All experiments were conducted on four Titan X GPUs.  
 
@@ -402,8 +393,8 @@ We follow the approach of \cite{milioto2018real} and split the new dataset into 
 
 
     \begin{figure}
-%	\vspace{1em} 
     \centering
+    \vspace{-1em}
     \includegraphics[width=\linewidth]{pics/pw_iou_stuttgart.pdf}
    		\caption{Pixel-wise mean IoU on the Stuttgart dataset.}
 		\label{fig:iou_stuttgart}    		
@@ -411,8 +402,8 @@ We follow the approach of \cite{milioto2018real} and split the new dataset into 
    \end{figure}
    
     \begin{figure}
-%    \vspace{1em} 
     \centering
+    \vspace{-1em}
     \includegraphics[width=\linewidth]{pics/pw_iou_zurich.pdf}
    		\caption{Pixel-wise mean IoU on the Zurich dataset.}
 		\label{fig:iou_zurich}    		
@@ -431,7 +422,7 @@ Tables \ref{tab:stuttgart} and \ref{tab:zurich} show how our approach performs o
 
 A few observations can be made: the effect of the sampling method is more pronounced when only a few images are selected. Again, it can be seen that methods measuring the influence of the samples on the weighs perform better. For instance, training a model with 20 samples picked with the gradient norm method produces accuracies that can only be achieved when picking 60 samples with the random method, lowering the annotation effort considerably.
 
-As the model is trained on more and more samples, the accuracy plateaus as is expected and the variation between the different methods decreases. It can be noted however that random sampling has a lower performance even with a greater number of images, and even produces fluctuating results on the more challenging Zurich dataset.
+As the model is trained on more and more samples, the accuracy plateaus as is expected and the variation between the different methods decreases. It can be noted however that random sampling has a lower performance even with a greater number of images.
 
 The gradient norm method shows a consistent improvement over other methods for different number of samples and across the two datasets, confirming that samples that might have a larger influence on the weights are more valuable for annotation, as the network can benefit more from them.
 
@@ -517,13 +508,16 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
   To analyze the samples picked by the gradient based approach, we plot the t-distributed Stochastic Neighbor Embedding (t-SNE) of the gradients in Figure \ref{fig:tsne}. Each circle in the plot denotes the 2-D embedding of the gradients of a single image before picking the first 10 samples. Red circles in the figure denote images selected by the Gradient Norm method. Points in the bottom left have a large norm of gradients, while the point in the upper left has the lowest norm of the gradient. Given the log-spacing of the selected samples, it can be seen that it more densely selects images that the network finds difficult, and the other selected points are more spread out. For future work, we plan to investigate how this embedding can be further exploited to pick the best samples.
    
        \begin{figure}
-%    \vspace{1em} 
+    \vspace{-1em} 
     \centering
     \includegraphics[width=\linewidth]{pics/tsne_grad_norm.pdf}
    		\caption{t-SNE of the images gradients on the Stuttgart dataset. The first 10 samples selected by the gradient norm method are shown in red.}
 		\label{fig:tsne}    		
  %   \vspace{1em}
    \end{figure}
+
+
+
 
 
 
@@ -606,7 +600,7 @@ approach in the domain for crop/weed classification for agricultural robots,
 reducing the annotation efforts when moving to different fields or environmental
 conditions.
 
-In our approach, we computed pseudo ground truth labels using unsupervised 
+In our approach, we computed pseudo ground truth labels using very weakly supervised 
 segmentation and use those labels to estimate how new, unlabeled samples will 
 affect the weights of the CNN if selected for training. We select the training
 samples for user annotation based on the estimated effect on the weights and use them to refine the 
