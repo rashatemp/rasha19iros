@@ -503,9 +503,7 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
     \end{table}
    
    
-   To analyze the samples picked by the gradient based approach, we plot the t-distributed Stochastic Neighbor Embedding (t-SNE) of the gradients in Figure \ref{fig:tsne}. Each circle in the plot denotes the 2-D embedding of the gradients of a single image before picking the first 10 samples. We found that the images in the upper half of the plot are the ones with a low loss and norm of gradients. These are the images that the network performs well on. The best being in the upper left section. In contrast, the bottom half has images that network finds more difficult. These have the largest loss and norm of gradients, with the highest being in the lower left section. In other words, the loss/norm of gradients decreases as we go from left to right in the bottom half then from right to left in the upper half.  
-   
-Red circles in the figure denote images selected by the Gradient Norm method. Given the log-spacing of the selected samples, it can be seen that it more densely selects images that the network finds difficult. For future work, we plan to investigate how this embedding can be further exploited to pick the best samples.
+  To analyze the samples picked by the gradient based approach, we plot the t-distributed Stochastic Neighbor Embedding (t-SNE) of the gradients in Figure \ref{fig:tsne}. Each circle in the plot denotes the 2-D embedding of the gradients of a single image before picking the first 10 samples. Red circles in the figure denote images selected by the Gradient Norm method. Points in the bottom left have a large norm of gradients, while the point in the upper left has the lowest norm of the gradient. Given the log-spacing of the selected samples, it can be seen that it more densely selects images that the network finds difficult, and the other selected points are more spread out. For future work, we plan to investigate how this embedding can be further exploited to pick the best samples.
    
        \begin{figure}
 %    \vspace{1em} 
