@@ -11,6 +11,8 @@
 \usepackage{algorithm}
 \usepackage[noend]{algpseudocode}
 \usepackage[activate=alltext]{microtype}
+\usepackage{rotating}
+
 
 \usepackage{subcaption} % enables use multiple figures in a figure
 \usepackage{tabu}     % provides advanced tables
@@ -433,7 +435,7 @@ A few observations can be made: the effect of the sampling method is more pronou
 
 As the model is trained on more and more samples, the accuracy plateaus as is expected and the variation between the different methods decreases. It can be noted however that random sampling has a lower performance even with a greater number of images, and even produces fluctuating results on the more challenging Zurich dataset.
 
-The gradient norm method shows consistent improvement over other methods for different number of samples and across the two datasets, confirming our intuition that samples that might have a larger influence on the weights are more valuable for annotation, as the network can benefit more from them.
+The gradient norm method shows a consistent improvement over other methods for different number of samples and across the two datasets, confirming that samples that might have a larger influence on the weights are more valuable for annotation, as the network can benefit more from them.
 
 Projecting out the gradients iteratively seems to be a promising method. For small number of images, it performs best but then the improvement afterwards is not as noticeable. Investigating the images that are being chosen in the fourth row and beyond for this method, we hypothesize that although these images will force the network weights to change in orthogonal directions, they might not be representative of a larger subset of images in the dataset. We plan to investigate this further in the future. 
 
@@ -529,13 +531,16 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
 
 
 
-    \begin{table*}
-       \vspace{1em}
+
+
+
+    \begin{table}
+     \vspace{1em}
         \centering
         \caption{Object-wise Performance on the Stuttgart dataset. Each row shows the performance after selecting 10 samples with the different methods and refining the network.}
         \begin{tabular}{@{}cccccc@{}} 
             \toprule
-             Samples No. & Random & Uncertainty & Loss & Gradient Norm & Gradient Proj.\\ 
+             \begin{sideways}Samples No.\end{sideways} & \begin{sideways}Random\end{sideways} & \begin{sideways}Uncertainty\end{sideways} & \begin{sideways}Loss\end{sideways} & \begin{sideways}Gradient Norm.\end{sideways} & \begin{sideways}Gradient Proj.\end{sideways} \\ 
             \midrule 
     		  10  & 0.6920 & 0.6437 & 0.7882 & 0.8040 & 0.8196 \\ \addlinespace
     		  20  & 0.7402 & 0.8408 & 0.7769 & 0.8350 & 0.8404 \\ \addlinespace
@@ -551,19 +556,19 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
         \end{tabular}
         \label{tab:stuttgart}
     %       \vspace{10em}
-    \end{table*}
+    \end{table}
     
     
 
     
     
     
-        \begin{table*}
+        \begin{table}
         \centering
         \caption{Object-wise Performance on the Zurich dataset. Each row shows the performance after selecting 10 samples with the different methods and refining the network.}
         \begin{tabular}{@{}cccccc@{}} 
             \toprule
-             Samples No. & Random & Uncertainty & Loss & Gradient Norm & Gradient Proj.\\ 
+             \begin{sideways}Samples No.\end{sideways} & \begin{sideways}Random\end{sideways} & \begin{sideways}Uncertainty\end{sideways} & \begin{sideways}Loss\end{sideways} & \begin{sideways}Gradient Norm.\end{sideways} & \begin{sideways}Gradient Proj.\end{sideways}\\ 
             \midrule 
     		  10  & 0.7552 & 0.6943 & 0.7697 & 0.8354 & 0.8025 \\ \addlinespace
     		  20  & 0.7971 & 0.8281 & 0.8189 & 0.8768 & 0.8170 \\ \addlinespace
@@ -578,7 +583,7 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
             \bottomrule
         \end{tabular}
         \label{tab:zurich}
-    \end{table*}
+    \end{table}
 
 
 
@@ -600,8 +605,26 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{CONCLUSION}
 \label{sec:conclusion}
-In this work, we design an approach for active learning that selects samples for annotation more effectively. We first obtain pseudo ground truth labels with unsupervised segmentation then use those labels to measure how the unlabeled samples might affect the weights if selected for training. We choose samples based on this ranking and refine the network on new datasets.
-We verified the performance of our gradient-based approach on two datasets that have different characteristics from the one which the network was pre-trained on. Our results show the effectiveness of our method as it produces higher accuracies with only a few number of samples, compared to random sampling or uncertainty based approaches. The effort in human annotation is thereby considerably reduced.
+
+In this paper, we proposed an active learning approach that supports semantic
+segmentation in new environments by effectively selecting samples for user
+annotation with the goal of minimizing the annotation effort. We applied our
+approach in the domain for automatic weed control for agricultural robots,
+reducing the annotation efforts when moving to different field or environmental
+conditions.
+
+In our approach, we compute pseudo ground truth labels using  unsupervised 
+segmentation then use those labels to estimate how new, unlabeled samples will 
+affect the weights of the CNN if selected for training. We select the training
+samples for user annotation based on the effect on the weights and refine the 
+network. We evaluated and verified the performance gain of our gradient-based 
+approach on two agricultural robotics datasets for weed detection. The datasets 
+reveal different characteristics from the data on which the network was pretrained.
+Our results show the effectiveness of our method as it produces higher
+accuracies with a smaller number of training samples, compared to random sampling as
+well as uncertainty-based approaches for selecting samples for annotation. As as result
+of that, the effort in human annotation is considerably reduced without compromising
+performance.
  
 
 %%\bibliographystyle{IEEEtran}
