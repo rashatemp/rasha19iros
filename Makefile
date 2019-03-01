@@ -1,6 +1,6 @@
 .PHONY : all latex bibtex view nonstop clean distclean
 
-TARGET=sheikh18iros
+TARGET=rasha19iros
 SOURCE=$(TARGET).tex
 NONSTOP=-interaction nonstopmode -halt-on-error -file-line-error
 
