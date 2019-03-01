@@ -120,7 +120,7 @@ Different to these works, we experiment with approaches that directly measure ho
 
 
 
-\section{APPROACH} \label{sec:approach}
+\section{Segmentation Framework} \label{sec:approach}
 
 
     \begin{figure*}
@@ -133,11 +133,10 @@ Different to these works, we experiment with approaches that directly measure ho
    \end{figure*}
 
 
-We use bonnet \cite{milioto2018bonnet} to train a model on the Bonn dataset. We then refine the trained model on other datasets by incrementally selecting batches of samples. The datasets differ in their crop/weed statistics and the images acquired with the cameras also differ in their illumination. Therefore, simply running the trained model to segment the vegetation in other fields does not work. We briefly first describe the architecture of the network used, then present different methods to select samples for refinement that we experimented with.
+We use Bonnet \cite{milioto2018bonnet} to train a model on the Bonn dataset. We then refine the trained model on other datasets by incrementally selecting batches of samples. The datasets differ in their crop/weed statistics and the images acquired with the cameras also differ in their illumination. Therefore, simply running the trained model to segment the vegetation in other fields does not work. We briefly first describe the architecture of the network used, then present different methods to select samples for refinement that we experimented with.
 
-\subsection{Model Architecture}
 
-We use the open-source network developed by \cite{milioto2018bonnet}. It was designed with efficiency in mind so that it is able to run at 20 Hz. The network is based on SegNet \cite{badrinarayanan2017segnet} and ENet \cite{paszke2016enet}. It has an encoder-decoder structure with a total of 25 [5x5] convolutional layers. It uses batch normalization, residual connections, and ReLU as the non-linearity layer. 
+Bonnet is an open-source deep network framework developed by \cite{milioto2018bonnet}. It was designed with efficiency in mind so that it is able to run at 20 Hz. The network is based on SegNet \cite{badrinarayanan2017segnet} and ENet \cite{paszke2016enet}. It has an encoder-decoder structure with a total of 25 [5x5] convolutional layers. It uses batch normalization, residual connections, and ReLU as the non-linearity layer. 
 
 To speed up prediction, the authors replace the [5x5] conventional convolutional layer with a mix of [1x1] convolutions and separable [1x5] and [5x1] convolutions. Additionally, instead of using the relatively more expensive transposed convolutions in the decoder, unpooling is done using the respective pooling indices in the encoder part.
 
@@ -161,7 +160,7 @@ As input to our network we only use the RGB channels.
 %25 convolutional layers.
 
 
-\section{Samples Selection}
+\section{Effective Sample Selection}
 
 We experimented with different approaches to select samples. The baseline is randomly selecting samples for annotation in batches of 10. The other approaches include selecting samples driven by the uncertainty of the network, the training loss, and the weights gradients of the network.   
 
@@ -520,7 +519,9 @@ Red circles in the figure denote images selected by the Gradient Norm method. Gi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{CONCLUSION}
 \label{sec:conclusion}
-
+In this work, we design an approach for active learning that selects samples for annotation more effectively. We first obtain pseudo ground truth labels with unsupervised segmentation then use those labels to measure how the unlabeled samples might affect the weights if selected for training. We choose samples based on this ranking and refine the network on new datasets.
+We verified the performance of our gradient-based approach on two datasets that have different characteristics from the one which the network was pre-trained on. Our results show the effectiveness of our method as it produces higher accuracies with only a few number of samples, compared to random sampling or uncertainty based approaches. The effort in human annotation is thereby considerably reduced.
+ 
 
 \bibliographystyle{IEEEtran}
 
