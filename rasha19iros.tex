@@ -85,11 +85,11 @@ application is the  transfer of an existing semantic segmentation CNN to a new
 field. We propose a novel a approach that, given a trained model on one field,
 refines the network on a substantially different field  providing an effective
 method of selecting samples to annotate for supporting the transfer. Our
-method takes into account the influence of the unlabeled samples on the
+method takes into account the influence of the so far unlabeled samples on the
 weights of the network and  ranks and selects them accordingly for annotation.
 We evaluated our approach on two challenging  datasets from the agricultural
 robotics domain and show that we achieve a higher accuracy with a  smaller
-number of samples compared to random sampling for annotation as well as
+number of samples compared to randomly selecting samples for annotation as well as
 uncertainty-based  approaches to select examples for annotation. Thus, our
 approach reduces the required human labeling  effort.
 
@@ -206,7 +206,7 @@ Different to these works, we experiment with approaches that directly measure ho
 
 
     \begin{figure*}
-%	\vspace{1em} 
+	\vspace{1em} 
     \centering
     \includegraphics[scale=0.9]{pics/output_system_overview.pdf}
    		\caption{Overview figure of our system. We first perform unsupervised segmentation to obtain pseudo ground truth. Given the labels and different measures produced by the network, we rank the unlabeled samples and pick them accordingly for annotation. These are then used to refine the network.}
@@ -302,6 +302,7 @@ The datasets we used were acquired with a Bosch Deepfield Robotics BoniRob UGV i
 
 
     \begin{table}
+        \vspace{1em}
         \centering
         \caption{Datasets Statistics of Crop and Weed Plants}
         \begin{tabular}{@{}lccccc@{}} 
@@ -403,7 +404,7 @@ We follow the approach of \cite{milioto2018real} and split the new dataset into 
 
 
     \begin{figure}
-%	\vspace{1em} 
+	\vspace{1em} 
     \centering
     \includegraphics[width=\linewidth]{pics/pw_iou_stuttgart.pdf}
    		\caption{Pixel-wise mean IoU on the Stuttgart dataset.}
@@ -472,6 +473,7 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
    
    
        \begin{table}
+       \vspace{1em}
         \centering
         \caption{Pixel-wise precision and recall on the Stuttgart dataset after selecting the first 10 samples}
         \begin{tabular}{@{}lcccc@{}} 
@@ -529,7 +531,11 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
 
 
 
+
+
+
     \begin{table}
+     \vspace{1em}
         \centering
         \caption{Object-wise Performance on the Stuttgart dataset. Each row shows the performance after selecting 10 samples with the different methods and refining the network.}
         \begin{tabular}{@{}cccccc@{}} 
