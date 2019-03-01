@@ -11,6 +11,8 @@
 \usepackage{algorithm}
 \usepackage[noend]{algpseudocode}
 \usepackage[activate=alltext]{microtype}
+\usepackage{rotating}
+
 
 \usepackage{subcaption} % enables use multiple figures in a figure
 \usepackage{tabu}     % provides advanced tables
@@ -527,12 +529,12 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
 
 
 
-    \begin{table*}
+    \begin{table}
         \centering
         \caption{Object-wise Performance on the Stuttgart dataset. Each row shows the performance after selecting 10 samples with the different methods and refining the network.}
         \begin{tabular}{@{}cccccc@{}} 
             \toprule
-             Samples No. & Random & Uncertainty & Loss & Gradient Norm & Gradient Proj.\\ 
+             \begin{sideways}Samples No.\end{sideways} & \begin{sideways}Random\end{sideways} & \begin{sideways}Uncertainty\end{sideways} & \begin{sideways}Loss\end{sideways} & \begin{sideways}Gradient Norm.\end{sideways} & \begin{sideways}Gradient Proj.\end{sideways} \\ 
             \midrule 
     		  10  & 0.6920 & 0.6437 & 0.7882 & 0.8040 & 0.8196 \\ \addlinespace
     		  20  & 0.7402 & 0.8408 & 0.7769 & 0.8350 & 0.8404 \\ \addlinespace
@@ -548,19 +550,19 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
         \end{tabular}
         \label{tab:stuttgart}
     %       \vspace{10em}
-    \end{table*}
+    \end{table}
     
     
 
     
     
     
-        \begin{table*}
+        \begin{table}
         \centering
         \caption{Object-wise Performance on the Zurich dataset. Each row shows the performance after selecting 10 samples with the different methods and refining the network.}
         \begin{tabular}{@{}cccccc@{}} 
             \toprule
-             Samples No. & Random & Uncertainty & Loss & Gradient Norm & Gradient Proj.\\ 
+             \begin{sideways}Samples No.\end{sideways} & \begin{sideways}Random\end{sideways} & \begin{sideways}Uncertainty\end{sideways} & \begin{sideways}Loss\end{sideways} & \begin{sideways}Gradient Norm.\end{sideways} & \begin{sideways}Gradient Proj.\end{sideways}\\ 
             \midrule 
     		  10  & 0.7552 & 0.6943 & 0.7697 & 0.8354 & 0.8025 \\ \addlinespace
     		  20  & 0.7971 & 0.8281 & 0.8189 & 0.8768 & 0.8170 \\ \addlinespace
@@ -575,7 +577,7 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
             \bottomrule
         \end{tabular}
         \label{tab:zurich}
-    \end{table*}
+    \end{table}
 
 
 
