@@ -197,7 +197,7 @@ Different to these works, we experiment with approaches that directly measure ho
 %	\vspace{1em} 
     \centering
     \includegraphics[scale=0.9]{pics/output_system_overview.pdf}
-   		\caption{System Overview.}
+   		\caption{Overview figure of our system. We first perform unsupervised segmentation to obtain pseudo ground truth. Given the labels and different measures produced by the network, we rank the unlabeled samples and pick them accordingly for annotation. These are then used to refine the network.}
 		\label{fig:overview}    		
 %    \vspace{1em}
    \end{figure*}
@@ -248,14 +248,14 @@ We then sort the images based on the computed uncertainty measure and pick the i
 
 \subsection{Loss} \label{sec:loss}
 
-For this approach and the following two, we pick those samples for annotation that might have the largest impact on the network weights. Given that the gradients w.r.t the network weights are driven by the loss, it provides a useful cue as to which samples the network will most benefit from. We first use unsupervised segmentation to produce pseudo-ground truth for the images. We then run the network on all the images and compute the loss with these labels as ground truth. The images are sorted based on this loss and again chosen on a log-space scale. We note that the pseudo-ground truth is only used to compute the loss but the network weights remain unchanged. They are only later updated with the manual annotations of the selected samples.
+The loss of the network is an indication of the segmentation error and given that the gradients w.r.t the network weights are driven by the loss, it provides a useful cue as to which samples the network will most benefit from. We first use unsupervised segmentation to produce pseudo-ground truth for the images. We then run the network on all the images and compute the loss with these labels as ground truth. The images are sorted based on this loss and again chosen on a log-space scale. We note that the pseudo-ground truth is only used to compute the loss but the network weights remain unchanged. They are only later updated with the manual annotations of the selected samples.
 
 For unsupervised segmentation, we only do foreground-background segmentation. In the train phase, we run k-means clustering on the RGB channels of 10 random samples of the new dataset to learn 20 clusters. The annotator can then look at a single image and choose those clusters that separate vegetation from soil. In our experiments, two clusters were enough. The rest of the images can then be annotated using those clusters. 
 
 
 \subsection{Norm of Gradients} \label{sec:grad_norm}
 
-The norm of the network gradients is another measure that is indicative of which samples will affect the weights more than others. As in the previous approach, we use labels from unsupervised segmentation as pseudo-ground truth. We run the network on the training images for one epoch and compute the gradients. Again we note that this step is only used to compute the gradients but we don't change the network weights. Once we have the gradients, we compute the $L_2$ norm of those in the last layer of the network (the classifier layer).
+For this approach and the following one, we pick those samples for annotation that might have the largest impact on the network weights. The norm of the network gradients is a measure that is indicative of which samples will affect the weights more than others. As in the previous approach, we use labels from unsupervised segmentation as pseudo-ground truth. We run the network on the training images for one epoch and compute the gradients. Again we note that this step is only used to compute the gradients but we don't change the network weights. Once we have the gradients, we compute the $L_2$ norm of those in the last layer of the network (the classifier layer).
 \begin{align}
 n_g(\bold{x}) &=  \left\lVert \nabla_{w_f} \mathcal{L}(\bold{x}) \right\rVert,
 \end{align}  
@@ -291,7 +291,7 @@ The datasets we used were acquired with a Bosch Deepfield Robotics BoniRob UGV i
 
     \begin{table}
         \centering
-        \caption{Datasets}
+        \caption{Datasets Statistics of Crop and Weed Plants}
         \begin{tabular}{@{}lccccc@{}} 
             \toprule
               & Bonn & Stuttgart & Zurich \\ 
