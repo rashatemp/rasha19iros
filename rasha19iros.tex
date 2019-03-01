@@ -80,7 +80,17 @@
 \label{sec:intro}
 
 
+Deep neural networks have proven to be exceptionally good at various vision related tasks, including object detection, classification and segmentation. That performance comes however at a cost: a lot of labeled training data is required.  We concern ourselves in this work with semantic segmentation, where the desired output is pixel-wise labeling of all images. Our target application is agricultural weeding using robotic vehicles. 
 
+Given annotated data on one agricultural field and a network that was trained on it, our goal is to transfer this knowledge onto other fields with minimum effort. This is a challenging task given the varying nature of the fields and the acquired images. Datasets from different locations have different crop and weed statistics. They also differ in their soil type and the various small objects that could be found on the ground, such as stones and dried vegetation, that classify as neither crop or weed. Additionally, the robot can acquire images of plants at a certain growth stage in one field, and acquire others at a later time in the same field or in another one where the plants are at a different growth stage. Lastly, artifacts such as contrast changes can be found in the camera images captured from the various locations. 
+
+These challenges make it difficult to simply take a network that was trained on one field and infer the labels on another. The network has to be re-trained on newly annotated images. Our goal is to minimize the effort needed to annotate images by using active learning to select samples that the network will most benefit from and will generalize to the rest of the unlabeled data. 
+
+We design approaches that directly take into account the impact of the samples selected on the weights of the network. Our intuition is motivated by the observation that given a trained model and unseen samples from a different domain, the samples that the network performs most poorly on, especially at the beginning, will have the largest weight gradients and consequently the largest impact on the weights.  
+
+To verify our approach, we select samples in batches, each time refining the network, then computing a new ranking of the unlabeled data. The best samples are then selected and the network is refined again. To compute the gradients, corresponding ground truth data is needed, which we assume does not exist. We circumvent this by using pseudo ground truth that we obtain with unsupervised segmentation. We test our framework on two datasets with different characteristics and analyze the results.
+
+Our contributions include using a novel method to intelligently pick samples based on the effect they have on the weight gradients. Our results indicate that our method produces a higher accuracy on both datasets with a fewer number of samples compared to random sampling or uncertainty based approaches.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{RELATED WORK}
