@@ -418,16 +418,13 @@ Tables \ref{tab:stuttgart} and \ref{tab:zurich} show how our approach performs o
 
 %As can be seen from the result,
 
-A few observations can be made: the effect of the sampling method is more pronounced when only a few images are selected. Again, it can be seen that methods measuring the influence of the samples on the weighs perform better. For instance, training a model with 20 samples picked with the gradient norm method produces accuracies that can only be achieved when picking 60 samples with the random method, lowering the annotation effort considerably.
+A few observations can be made: the effect of the sampling method is more pronounced when only a few images are selected. Again, it can be seen that methods measuring the influence of the samples on the weights perform better. For instance, training a model with 20 samples picked with the gradient norm method produces accuracies that can only be achieved when picking 60 samples with the random method, lowering the annotation effort considerably.
 
 As the model is trained on more and more samples, the accuracy plateaus as is expected and the variation between the different methods decreases. It can be noted however that random sampling has a lower performance even with a greater number of images.
 
 The gradient norm method shows a consistent improvement over other methods for different number of samples and across the two datasets, confirming that samples that might have a larger influence on the weights are more valuable for annotation, as the network can benefit more from them.
 
-Projecting out the gradients iteratively seems to be a promising method. For small number of images, it performs best but then the improvement afterwards is not as noticeable. Investigating the images that are being chosen in the fourth row and beyond for this method, we hypothesize that although these images will force the network weights to change in orthogonal directions, they might not be representative of a larger subset of images in the dataset. We plan to investigate this further in the future. 
-
-
-
+We combined the idea of gradient-based selection with two alternative approaches to achieving diversity in the selected images: Picking on a log-space scale, or projecting out gradients that have been selected previously. In our experiments, both strategies performed well. Our selection scheme might be improved further by adding a mechanism to ensure that selected images are representative of a larger subset in the overall dataset. We plan to investigate this in our future work.
  
  %  \begin{subfigure}[b]{0.49\linewidth}
 
