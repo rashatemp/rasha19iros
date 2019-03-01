@@ -58,11 +58,11 @@
 %DIFF 2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\title{\LARGE \bf Gradient-based Active Learning for Semantic Segmentation\\of Crop and Weed Plants for Agricultural Robots}
+\title{\LARGE \bf Gradient-based Active Learning for Semantic Segmentation of Crop and Weed for Agricultural Robots }
 
 \author{Rasha Sheikh \and Philipp Lottes \and Andres Milioto \and Cyrill Stachniss \and Maren Bennewitz \and Thomas Schultz% <-this % stops a space
   \thanks{All authors are with the University of
-    Bonn, Germany. This work has partly been supported by the DFG-funded Cluster of Excellence EXC~2070 PhenoRob.}
+    Bonn, Germany.}%
 }
 
 \begin{document}
@@ -72,6 +72,7 @@
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<<<<<<< HEAD
 \begin{abstract}
 Annotated datasets are essential for supervised learning. However, annotating
 large datasets to  train deep neural networks that perform well is a tedious
@@ -90,6 +91,7 @@ robotics domain and show that we achieve a higher accuracy with a  smaller
 number of samples compared to random sampling for annotation as well as
 uncertainty-based  approaches to select examples for annotation. Thus, our
 approach reduces the required human labeling  effort.
+
 \end{abstract} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -159,6 +161,7 @@ with different characteristics.  Our results indicate that our method produces a
 higher accuracy on both, datasets with a fewer  number of samples compared to
 random sampling for annotation as well as uncertainty based approaches.
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{RELATED WORK}
 \label{sec:related}
@@ -180,6 +183,8 @@ The authors of \cite{sener2017geometric} assert based on the experiments they pe
 In \cite{wang2017cost}, two sets of samples are selected for annotation that can then be used by the network to refine the model. The first set consists of samples that the network is uncertain about. These include samples with the lowest softmax confidence values, samples with the highest entropy, and lastly samples with a small margin of probability difference between the most probable class and the second most probable class. This first set is then presented to a human for annotation. The second set consists of samples that the network is highly certain about, these are assigned their predicted classes as pseudo labels and added to the set of training samples without asking a human to annotate them.
 
 The Expected Model Output Change Principle (EMOC) developed by \cite{freytag2014selecting} tries to avoid selecting samples that are redundant and \cite{kading2016active} follow this approach with deep neural networks. This principle measures how a model would perform with and without the candidate sample. Given that the labels are unknown, a marginalization over the possible labels is needed. This marginalization however can be expensive when having a large number of classes, so the authors use maximum a-posteriori approximation instead and use the class with the highest probability prediction.
+
+In the context of self-learning, the authors of \cite{zhang2018self} use labels obtained with K-means graph cuts as ground truth for their network. The predictions produced by the model are then used as the target labels for the next iteration of the process.  
 
 Different to these works, we experiment with approaches that directly measure how annotated samples can affect the gradients. We use labels obtained with unsupervised segmentation as pseudo ground truth and compute the gradients w.r.t the weights. We then refine a pre-trained network with the newly annotated samples in an iterative manner. 
 
@@ -233,7 +238,7 @@ We experimented with different approaches to select samples. The baseline is ran
 
 \subsection{Uncertainty}
 
-To infer the pixel-wise semantic segmentation of a new image, the network computes softmax probabilities in its last layer. The probabilities can serve as a guide as to which samples the network is most uncertain of. For every image passed through the network, we compute the following measure of the prediction uncertainty:
+To infer the pixel-wise semantic segmentation of a new image, the network computes softmax probabilities in its last layer. The probabilities can serve as a guide as to which samples the network is most uncertain of. For every image passed through the network, we compute the following measure of the prediction confidence:
 \begin{align}
 u(\bold{x}) &= \frac{1}{N} \sum_{i=1}^N \max_c p(c|x_i),
 \end{align}  
@@ -244,9 +249,9 @@ We then sort the images based on the computed uncertainty measure and pick the i
 
 \subsection{Loss} \label{sec:loss}
 
-For this approach and the following two, we pick those samples for annotation that might have the largest impact on the network weights. Given that the gradients w.r.t the network weights are driven by the loss, it provides a useful cue as to which samples are more worthy of being annotated. We first use unsupervised segmentation to produce pseudo-ground truth for the images. We then run the network on all the images and compute the loss with these labels as ground truth. The images are sorted based on this loss and again chosen on a log-space scale. We note that the pseudo-ground truth is only used to compute the loss but the network weights remain unchanged. 
+For this approach and the following two, we pick those samples for annotation that might have the largest impact on the network weights. Given that the gradients w.r.t the network weights are driven by the loss, it provides a useful cue as to which samples the network will most benefit from. We first use unsupervised segmentation to produce pseudo-ground truth for the images. We then run the network on all the images and compute the loss with these labels as ground truth. The images are sorted based on this loss and again chosen on a log-space scale. We note that the pseudo-ground truth is only used to compute the loss but the network weights remain unchanged. They are only later updated with the manual annotations of the selected samples.
 
-For unsupervised segmentation, we only do foreground-background segmentation by running k-means clustering on 10 random samples of the new dataset to learn 20 clusters. The annotator can then look at a single image and choose those clusters that separate vegetation from soil. In our experiments, two clusters were enough. The rest of the images can then be annotated using those clusters. 
+For unsupervised segmentation, we only do foreground-background segmentation. In the train phase, we run k-means clustering on the RGB channels of 10 random samples of the new dataset to learn 20 clusters. The annotator can then look at a single image and choose those clusters that separate vegetation from soil. In our experiments, two clusters were enough. The rest of the images can then be annotated using those clusters. 
 
 
 \subsection{Norm of Gradients} \label{sec:grad_norm}
@@ -261,11 +266,11 @@ The images are sorted based on this measure and we pick samples on a log-space s
 
 \subsection{Gradient Projection} \label{sec:grad_proj}
 
-The log-space in the previous approaches was used to ensure there is enough diversity among the samples so that the network does not overfit on them and can generalize to unseen data. Here we use a different method that relies on the space spanned by the gradients. For every sample picked we project the gradients of all remaining samples onto the selected sample gradient. We then subtract the projected gradient from the original gradients. The residual we are left with indicates which samples are most different from the one that was selected. This can be formulated as:
+The log-space in the previous approaches was used to ensure there is enough diversity among the samples so that the network does not overfit on them and can generalize to unseen data. Here we use a different method that relies on the space spanned by the gradients where we project onto the orthogonal complement of the gradients of the selected samples. For every sample picked we project the gradients of all remaining samples onto the selected sample gradient. We then subtract the projected gradient from the original gradients. The residual we are left with indicates which samples have the strongest remaining effect on the weights after accounting for the already selected samples. This can be formulated as:
 \begin{align}
 n_p(\bold{x}) &=  \left\lVert \bold{g_x} - \sum_{i=1}^S \frac{\left\langle \bold{g_s}, \bold{g_x} \right\rangle}{\left\langle \bold{g_s}, \bold{g_s} \right\rangle} \bold{g_s} \right\rVert,
 \end{align}
-where $g_s$ is the gradient of the selected sample, and $g_x$ is the gradient of the current sample.
+where $g_s$ is the gradient of the previously selected sample, and $g_x$ is the gradient of the current sample.
 
 We select samples one by one, each time sorting them according to this measure and choosing the one with the highest norm of the residual. To pick the first sample, we choose that with the highest norm of the gradient.
 
@@ -464,11 +469,11 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
            \cmidrule{2-5} 
                & Weed & Crop & Weed & Crop \\ 
             \midrule 
-    		  Random & 0.4095 & 0.7278 & 0.4851 & 0.6946  \\ \addlinespace
-    		  Uncertainty & 0.5580 & 0.6646 & 0.2711 & 0.8880  \\ \addlinespace
+    		  Random & \textit{0.4095} & 0.7278 & 0.4851 & \textit{0.6946}  \\ \addlinespace
+    		  Uncertainty & 0.5580 & \textit{0.6646} & \textit{0.2711} & \textbf{0.8880}  \\ \addlinespace
     		  Loss & 0.5331 & 0.8025 & 0.6179 & 0.8112  \\ \addlinespace
-    		  Gradient Norm & 0.5970 & 0.8259 & 0.6136 & 0.8402  \\ \addlinespace
-    		  Gradient Projection & 0.5745 & 0.8365 & 0.6564 & 0.8212  \\ 
+    		  Gradient Norm & \textbf{0.5970} & 0.8259 & 0.6136 & 0.8402  \\ \addlinespace
+    		  Gradient Projection & 0.5745 & \textbf{0.8365} & \textbf{0.6564} & 0.8212  \\ 
             \bottomrule
         \end{tabular}
         \label{tab:pixel_wise_10_stuttgart}
@@ -487,11 +492,11 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
            \cmidrule{2-5} 
                & Weed & Crop & Weed & Crop \\ 
             \midrule 
-    		  Random & 0.8723 & 0.5740 & 0.6587 & 0.6474  \\ \addlinespace
-    		  Uncertainty & 0.9476 & 0.4586 & 0.4919 & 0.8854  \\ \addlinespace
+    		  Random & \textit{0.8723} & 0.5740 & 0.6587 & 0.6474  \\ \addlinespace
+    		  Uncertainty & \textbf{0.9476} & \textit{0.4586} & \textit{0.4919} & \textbf{0.8854}  \\ \addlinespace
     		  Loss & 0.9005 & 0.6898 & 0.7811 & 0.7351  \\ \addlinespace
-    		  Gradient Norm & 0.9090 & 0.7390 & 0.7970 & 0.7536  \\ \addlinespace
-    		  Gradient Projection & 0.9030 & 0.7308 & 0.8289 & 0.7375  \\ 
+    		  Gradient Norm & 0.9090 & \textbf{0.7390} & 0.7970 & 0.7536  \\ \addlinespace
+    		  Gradient Projection & 0.9030 & 0.7308 & \textbf{0.8289} & 0.7375  \\ 
             \bottomrule
         \end{tabular}
         \label{tab:object_wise_10_stuttgart}
