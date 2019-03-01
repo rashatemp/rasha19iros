@@ -58,7 +58,7 @@
 %DIFF 2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\title{\LARGE \bf Active Learning for Semantic Segmentation of Crop and Weed for Agricultural Robots }
+\title{\LARGE \bf Gradient-based Active Learning for Semantic Segmentation of Crop and Weed for Agricultural Robots }
 
 \author{Rasha Sheikh \and Philipp Lottes \and Andres Milioto \and Cyrill Stachniss \and Maren Bennewitz \and Thomas Schultz% <-this % stops a space
   \thanks{All authors are with the University of
@@ -73,6 +73,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{abstract} 
+Annotating large datasets to train deep neural networks that perform well is a tedious task. Active learning can be used to minimize the human effort in labeling the images. Our target application is weeding with agricultural robots where there is a need to distinguish crop from weed. Given a trained model on one field, our goal is to refine the network on a completely different field using a more effective method of selecting samples to annotate than random sampling. We design a method that takes into account the influence of the unlabeled samples on the weights of the network, rank them, and choose them accordingly to be annotated. We test our approach on two datasets and show that we achieve a higher accuracy with a smaller number of samples compared to random and uncertainty based approaches. 
 \end{abstract} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
