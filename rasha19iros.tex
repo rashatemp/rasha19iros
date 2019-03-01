@@ -82,7 +82,7 @@ of semantic segmentation with the goal of reducing the  human labeling effort.
 Our target application is agricultural robotics and we focus on the task of
 distinguishing between crop and weed plants from image data. A key challenge in this
 application is the  transfer of an existing semantic segmentation CNN to a new
-field. We propose a novel a approach that, given a trained model on one field,
+field. We propose a novel approach that, given a trained model on one field,
 refines the network on a substantially different field  providing an effective
 method of selecting samples to annotate for supporting the transfer. Our
 method takes into account the influence of the so far unlabeled samples on the
@@ -151,15 +151,13 @@ these training samples will have on the weight gradients of the CNN. Our
 strategy is based  on the observation that given a trained model and unseen
 samples from  a different domain, the samples that the network performs most
 poorly on, especially at the  beginning, will have the largest weight
-gradients and consequently the largest impact on the  weights.   Our approach
+gradients and consequently the largest impact on the  weights. This strategy might appear to be circular, since computing gradients already requires class labels at a stage where are still selecting images for labeling.  We circumvent this by using pseudo ground truth that we obtain with very weakly supervised segmentation. Our approach
 selects samples in batches, each time refining the network, then computing a
-new  ranking of the unlabeled data. The best samples are then selected and the
-network is refined a gain. To compute the gradients, corresponding ground
-truth data is needed, which we assume does  not exist. We circumvent this by
-using pseudo ground truth that we obtain with unsupervised  segmentation.  We
+new  ranking of the remaining unlabeled data. The best samples are then selected and the
+network is refined again.  We
 implemented and evaluated our framework on  agricultural datasets~\cite{chebrolu2017agricultural} 
 with different characteristics.  Our results indicate that our method produces a
-higher accuracy on both datasets with a fewer  number of samples compared to
+higher accuracy on both datasets with a lower  number of samples compared to
 random sampling for annotation as well as uncertainty based approaches.
 
 
@@ -197,7 +195,7 @@ The Expected Model Output Change Principle (EMOC) developed by Freytag~\etal~\ci
 
 In the context of self-learning, Zhang~\etal~\cite{zhang2018self} use labels obtained with K-means graph cuts as ground truth for their network. The predictions produced by the model are then used as the target labels for the next iteration of the process.  
 
-Different to these works, we experiment with approaches that directly measure how annotated samples can affect the gradients. We use labels obtained with unsupervised segmentation as pseudo ground truth and compute the gradients w.r.t the weights. We then refine a pre-trained network with the newly annotated samples in an iterative manner. 
+Different to these works, we experiment with approaches that directly measure how annotated samples can affect the gradients. We use labels obtained with very weak supervision as pseudo ground truth and compute the gradients w.r.t the weights. We then refine a pre-trained network with the newly annotated samples in an iterative manner. 
 
 
 
@@ -208,7 +206,7 @@ Different to these works, we experiment with approaches that directly measure ho
     \begin{figure*}
     \centering
     \includegraphics[scale=0.9]{pics/output_system_overview.pdf}
-   		\caption{Overview figure of our system. We first perform unsupervised segmentation to obtain pseudo ground truth. Given the labels and different measures produced by the network, we rank the unlabeled samples and pick them accordingly for annotation. These are then used to refine the network.}
+   		\caption{Overview figure of our system. We first perform very weakly supervised segmentation to obtain pseudo ground truth. Given the labels and different measures produced by the network, we rank the unlabeled samples and pick them accordingly for annotation. These are then used to refine the network.}
 		\label{fig:overview}    		
 %    \vspace{1em}
    \end{figure*}
@@ -259,14 +257,16 @@ We then sort the images based on the computed uncertainty measure and pick the i
 
 \subsection{Loss} \label{sec:loss}
 
-The loss of the network is an indication of the segmentation error and given that the gradients w.r.t the network weights are driven by the loss, it provides a useful cue as to which samples the network will most benefit from. We first use unsupervised segmentation to produce pseudo-ground truth for the images. We then run the network on all the images and compute the loss with these labels as ground truth. The images are sorted based on this loss and again chosen on a log-space scale. We note that the pseudo-ground truth is only used to compute the loss but the network weights remain unchanged. They are only later updated with the manual annotations of the selected samples.
+The loss of the network is an indication of the segmentation error. Given that training neural networks with backpropagation is driven by the loss, it also provides a useful cue as to which samples the network will most benefit from. We compute the loss based on a pseudo-ground truth, consisting of a foreground-background segmentation that we achieve using k-means clustering on the RGB channels.
 
-For unsupervised segmentation, we only do foreground-background segmentation. In the train phase, we run k-means clustering on the RGB channels of 10 random samples of the new dataset to learn 20 clusters. The annotator can then look at a single image and choose those clusters that separate vegetation from soil. In our experiments, two clusters were enough. The rest of the images can then be annotated using those clusters. 
+Initially, we use k-means to determine 20 cluster representatives from 10 randomly selected images. After viewing a single image that contains all 20 clusters, a human annotator chooses which clusters represent vegetation. In our experiments, it was enough to select two clusters. In accordance with previously used terminology \cite{zhang2018self}, we refer to this step as being very weakly supervised, since it only involves inspecting a single image. 
+
+Pseudo ground truth is generated for all unlabeled images by assigning pixels to the selected clusters, and the loss is computed with respect to it. The images are sorted based on this loss and again chosen on a log-space scale. We note that the pseudo ground truth is only used to compute the loss but the network weights remain unchanged. They are only later updated with the manual annotations of the selected samples.
 
 
 \subsection{Norm of Gradients} \label{sec:grad_norm}
 
-For this approach and the following one, we pick those samples for annotation that might have the largest impact on the network weights. The norm of the network gradients is a measure that is indicative of which samples will affect the weights more than others. As in the previous approach, we use labels from unsupervised segmentation as pseudo-ground truth. We run the network on the training images for one epoch and compute the gradients. Again we note that this step is only used to compute the gradients but we don't change the network weights. Once we have the gradients, we compute the $L_2$ norm of those in the last layer of the network (the classifier layer).
+For this approach and the following one, we pick those samples for annotation that might have the largest impact on the network weights. The norm of the network gradients is a measure that is indicative of which samples will affect the weights more than others. As in the previous approach, we use labels from very weakly supervised segmentation as pseudo ground truth. We run the network on the training images for one epoch and compute the gradients. Again we note that this step is only used to compute the gradients but we don't change the network weights. Once we have the gradients, we compute the $L_2$ norm of those in the last layer of the network (the classifier layer).
 \begin{align}
 n_g(\bold{x}) &=  \left\lVert \nabla_{w_f} \mathcal{L}(\bold{x}) \right\rVert,
 \end{align}  
@@ -383,7 +383,7 @@ The datasets we used were acquired with a Bosch Deepfield Robotics BoniRob UGV i
 
 We evaluate our different approaches by first training a network on the Bonn dataset then refining it on the Stuttgart and Zurich datasets. To refine the network we pick unlabeled samples in batches of 10 using one of the methods described in Section \ref{sec:approach}. Once they are annotated, they are presented to the network. We repeat this process iteratively, each time refining the network on all of the newly annotated samples. 
 
-For the methods presented in sections \ref{sec:loss}, \ref{sec:grad_norm}, and \ref{sec:grad_proj}, we first obtain foreground masks with unsupervised segmentation. Figure  \ref{fig:unsupervised_foreground} shows an image, its ground truth and the foreground segmentation provided by clustering. Note that a rough segmentation is enough to be useful for these approaches.
+For the methods presented in sections \ref{sec:loss}, \ref{sec:grad_norm}, and \ref{sec:grad_proj}, we first obtain foreground masks with very weak supervision. Figure  \ref{fig:unsupervised_foreground} shows an image, its ground truth and the foreground segmentation provided by clustering. Note that a rough segmentation is enough to be useful for these approaches.
 
 We follow the approach of \cite{milioto2018real} and split the new dataset into three sets: 40\% for training, 10\% for validation, and 50\% for testing. The samples are picked from the training set. All experiments were conducted on four Titan X GPUs.  
 
@@ -598,7 +598,7 @@ approach in the domain for crop/weed classification for agricultural robots,
 reducing the annotation efforts when moving to different fields or environmental
 conditions.
 
-In our approach, we computed pseudo ground truth labels using unsupervised 
+In our approach, we computed pseudo ground truth labels using very weakly supervised 
 segmentation and use those labels to estimate how new, unlabeled samples will 
 affect the weights of the CNN if selected for training. We select the training
 samples for user annotation based on the estimated effect on the weights and use them to refine the 
