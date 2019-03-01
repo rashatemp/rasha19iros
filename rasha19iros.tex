@@ -36,7 +36,7 @@
 %%\usepackage{flushend}
 
 %% Style hacks to save space
-\setlength{\textfloatsep}{1.95em}
+%\setlength{\textfloatsep}{1.95em}
 %\setlength{\dbltextfloatsep}{1.1em}
 %\usepackage[font=small]{caption}
 
@@ -99,7 +99,7 @@ approach reduces the required human labeling  effort.
 \section{INTRODUCTION}
 \label{sec:intro}
 
-The ability to semantically interpret the scene in front of a robot is key for
+The ability to  interpret the scene in front of a robot is key for
 intelligent behavior in several applications. For example, precision farming
 robots need to know which type of plant they perceive or autonomous cars need to
 know  which object in their surroundings is a car, a pedestrian, or a
@@ -204,7 +204,6 @@ Different to these works, we experiment with approaches that directly measure ho
 
 
     \begin{figure*}
-	\vspace{1em} 
     \centering
     \includegraphics[scale=0.9]{pics/output_system_overview.pdf}
    		\caption{Overview figure of our system. We first perform very weakly supervised segmentation to obtain pseudo ground truth. Given the labels and different measures produced by the network, we rank the unlabeled samples and pick them accordingly for annotation. These are then used to refine the network.}
@@ -302,7 +301,6 @@ The datasets we used were acquired with a Bosch Deepfield Robotics BoniRob UGV i
 
 
     \begin{table}
-        \vspace{1em}
         \centering
         \caption{Datasets Statistics of Crop and Weed Plants}
         \begin{tabular}{@{}lccccc@{}} 
@@ -321,43 +319,36 @@ The datasets we used were acquired with a Bosch Deepfield Robotics BoniRob UGV i
     
     
     \begin{figure}
-	\vspace{1em} 
     \centering
      \begin{subfigure}[b]{0.49\linewidth}
     \includegraphics[width=\linewidth]{pics/bonn/images/bonirob_2016-04-28-12-20-29_6_frame217.png}
    		\caption{}
 		\label{bonn_img}    		
-    \vspace{1em}
    \end{subfigure}
         \begin{subfigure}[b]{0.49\linewidth}
     \includegraphics[width=\linewidth]{pics/bonn/annotations/bonirob_2016-04-28-12-20-29_6_frame217.png}
    		\caption{}
 		\label{bonn_lbl}    		
-    \vspace{1em}
    \end{subfigure}
         \begin{subfigure}[b]{0.49\linewidth}
     \includegraphics[width=\linewidth]{pics/stuttgart/images/masks_8mm_fromImages_frame479.png}
    		\caption{}
 		\label{stuttgart_img}    		
-    \vspace{1em}
    \end{subfigure}
         \begin{subfigure}[b]{0.49\linewidth}
     \includegraphics[width=\linewidth]{pics/stuttgart/annotations/masks_8mm_fromImages_frame479_GroundTruth_iMap.png}
    		\caption{}
 		\label{stuttgart_lbl}    		
-    \vspace{1em}
    \end{subfigure}
         \begin{subfigure}[b]{0.49\linewidth}
     \includegraphics[width=\linewidth]{pics/zurich/images/bonirob_2016-10-13-09-03-00_0_frame66.png}
    		\caption{}
 		\label{zurich_img}    		
-    \vspace{1em}
    \end{subfigure}
         \begin{subfigure}[b]{0.49\linewidth}
     \includegraphics[width=\linewidth]{pics/zurich/annotations/bonirob_2016-10-13-09-03-00_0_frame66.png}
    		\caption{}
 		\label{zurich_lbl}    		
-    \vspace{1em}
    \end{subfigure}
     \caption{Sample images from the Bonn, Stuttgart, and Zurich datasets in the first, second, and third row respectively. The first column shows the RGB images and the second column shows their annotations. Green denotes crop while red denoted weed.}
     \label{fig:datasets_images}
@@ -367,25 +358,21 @@ The datasets we used were acquired with a Bosch Deepfield Robotics BoniRob UGV i
 
     
     \begin{figure}
-	\vspace{1em} 
     \centering
-     \begin{subfigure}[b]{0.49\linewidth}
+     \begin{subfigure}[b]{0.31\linewidth}
     \includegraphics[width=\linewidth]{pics/unsupervised/img_masks_8mm_fromImages_frame256.png}
-   		\caption{}
+   		\caption{input}
 		\label{unsup_img}    		
-    \vspace{1em}
    \end{subfigure}
-        \begin{subfigure}[b]{0.49\linewidth}
+        \begin{subfigure}[b]{0.31\linewidth}
     \includegraphics[width=\linewidth]{pics/unsupervised/gt_masks_8mm_fromImages_frame256_GroundTruth_iMap.png}
-   		\caption{}
+   		\caption{ground truth}
 		\label{unsup_gt}    		
-    \vspace{1em}
    \end{subfigure}
-      \begin{subfigure}[b]{0.49\linewidth}
+      \begin{subfigure}[b]{0.31\linewidth}
     \includegraphics[width=\linewidth]{pics/unsupervised/lbl_masks_8mm_fromImages_frame256.png}
-   		\caption{}
+   		\caption{segmentation mask}
 		\label{unsup_lbl}    		
-    \vspace{1em}
    \end{subfigure}
     \caption{Foreground segmentation of vegetation. Note that only a rough segmentation is enough for our approach.}
     \label{fig:unsupervised_foreground}
@@ -404,8 +391,8 @@ We follow the approach of \cite{milioto2018real} and split the new dataset into 
 
 
     \begin{figure}
-	\vspace{1em} 
     \centering
+    \vspace{-1em}
     \includegraphics[width=\linewidth]{pics/pw_iou_stuttgart.pdf}
    		\caption{Pixel-wise mean IoU on the Stuttgart dataset.}
 		\label{fig:iou_stuttgart}    		
@@ -413,8 +400,8 @@ We follow the approach of \cite{milioto2018real} and split the new dataset into 
    \end{figure}
    
     \begin{figure}
-%    \vspace{1em} 
     \centering
+    \vspace{-1em}
     \includegraphics[width=\linewidth]{pics/pw_iou_zurich.pdf}
    		\caption{Pixel-wise mean IoU on the Zurich dataset.}
 		\label{fig:iou_zurich}    		
@@ -473,7 +460,6 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
    
    
        \begin{table}
-       \vspace{1em}
         \centering
         \caption{Pixel-wise precision and recall on the Stuttgart dataset after selecting the first 10 samples}
         \begin{tabular}{@{}lcccc@{}} 
@@ -520,7 +506,7 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
   To analyze the samples picked by the gradient based approach, we plot the t-distributed Stochastic Neighbor Embedding (t-SNE) of the gradients in Figure \ref{fig:tsne}. Each circle in the plot denotes the 2-D embedding of the gradients of a single image before picking the first 10 samples. Red circles in the figure denote images selected by the Gradient Norm method. Points in the bottom left have a large norm of gradients, while the point in the upper left has the lowest norm of the gradient. Given the log-spacing of the selected samples, it can be seen that it more densely selects images that the network finds difficult, and the other selected points are more spread out. For future work, we plan to investigate how this embedding can be further exploited to pick the best samples.
    
        \begin{figure}
-%    \vspace{1em} 
+    \vspace{-1em} 
     \centering
     \includegraphics[width=\linewidth]{pics/tsne_grad_norm.pdf}
    		\caption{t-SNE of the images gradients on the Stuttgart dataset. The first 10 samples selected by the gradient norm method are shown in red.}
@@ -535,7 +521,6 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
 
 
     \begin{table}
-     \vspace{1em}
         \centering
         \caption{Object-wise Performance on the Stuttgart dataset. Each row shows the performance after selecting 10 samples with the different methods and refining the network.}
         \begin{tabular}{@{}cccccc@{}} 
