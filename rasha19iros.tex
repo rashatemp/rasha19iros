@@ -132,15 +132,15 @@ on it, we address the problem of transferring this knowledge to new fields with
 minimum effort.  Datasets from different fields reveal different crop and weed
 statistics. They almost  always differ by soil type, weather condition, or
 various small objects that can be found  on the ground, such as stones, dried
-vegetation, or marks from agricultural machines,  i.e. patterns that are
+vegetation, or marks from agricultural machines,  i.e., patterns that are
 neither crop nor weed. Additionally, the robot can acquire  images of plants
 at a certain growth stage in one field, while the growth state on the  target
 field is different. Lastly, artifacts such as contrast changes can be found in
 the camera images captured from the various locations.  These conditions make
 it difficult to simply reuse a previously trained network from one  field and
-infer the labels on another, see also~\cite{lottes2018ral,lottes2017iros}. Thus, 
+infer the labels on another~\cite{lottes2018ral,lottes2017iros}. Thus, 
 the network has to be
-re-trained on  annotated images taken in the new field and we propose an
+re-trained on  annotated images taken in the new field. We propose an
 active learning  approach to select samples that the network will most benefit
 from and will generalize  to the rest of the unlabeled data while minimizing
 the effort of annotating images.
@@ -154,13 +154,12 @@ poorly on, especially at the  beginning, will have the largest weight
 gradients and consequently the largest impact on the  weights.   Our approach
 selects samples in batches, each time refining the network, then computing a
 new  ranking of the unlabeled data. The best samples are then selected and the
-network is refined a gain. To compute the gradients, corresponding ground
-truth data is needed, which we assume does  not exist. We circumvent this by
-using pseudo ground truth that we obtain with unsupervised  segmentation.  We
+network is re-trained. To compute the gradients, corresponding ground
+truth data is needed. In our approach, we treat the result of unsupervised  segmentation as ground truth.  We
 implemented and evaluated our framework on  agricultural datasets~\cite{chebrolu2017agricultural} 
 with different characteristics.  Our results indicate that our method produces a
-higher accuracy on both datasets with a fewer  number of samples compared to
-random sampling for annotation as well as uncertainty based approaches.
+higher accuracy on the datasets with a fewer  number of samples compared to
+random sampling for annotation as well as uncertainty-based approaches.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
