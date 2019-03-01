@@ -58,7 +58,7 @@
 %DIFF 2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\title{\LARGE \bf Gradient-based Active Learning for Semantic Segmentation of Crop and Weed for Agricultural Robots }
+\title{\LARGE \bf Gradient-based Active Learning for Semantic Segmentation\\of Crop and Weed Plants for Agricultural Robots}
 
 \author{Rasha Sheikh \and Philipp Lottes \and Andres Milioto \and Cyrill Stachniss \and Maren Bennewitz \and Thomas Schultz% <-this % stops a space
   \thanks{All authors are with the University of
@@ -72,8 +72,21 @@
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{abstract} 
-Annotating large datasets to train deep neural networks that perform well is a tedious task. Active learning can be used to minimize the human effort in labeling the images. Our target application is weeding with agricultural robots where there is a need to distinguish crop from weed. Given a trained model on one field, our goal is to refine the network on a completely different field using a more effective method of selecting samples to annotate than random sampling. We design a method that takes into account the influence of the unlabeled samples on the weights of the network, rank them, and choose them accordingly to be annotated. We test our approach on two datasets and show that we achieve a higher accuracy with a smaller number of samples compared to random and uncertainty based approaches. 
+\begin{abstract}
+Annotated datasets are essential for supervised learning. However, annotating large datasets to 
+train deep neural networks that perform well is a tedious and time-intensive task. This paper 
+addresses active learning in the context of semantic segmentation with the goal of reducing the 
+human labeling effort. Our target application agricultural robotics and we focus on the task of 
+distinguish crop from weed plants from image data. A key challenge in this application is the 
+transfer of an existing semantic segmentation CNN to a new field. We propose a novel a approach
+that, given a trained model on one field, refines the network on a substantially different field 
+providing an effective method of selecting samples to annotate for supporting the transfer. Our 
+method takes into account the influence of the unlabeled samples on the weights of the network and 
+ranks and selects them accordingly for annotation. We evaluated our approach on two challenging 
+datasets from the agricultural robotics domain and show that we achieve a higher accuracy with a 
+smaller number of samples compared to random sampling for annotation as well as uncertainty-based 
+approaches to select examples for annotation. Thus, our approach reduces the required human labeling 
+effort.
 \end{abstract} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
