@@ -609,18 +609,18 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
 In this paper, we proposed an active learning approach that supports semantic
 segmentation in new environments by effectively selecting samples for user
 annotation with the goal of minimizing the annotation effort. We applied our
-approach in the domain for automatic weed control for agricultural robots,
-reducing the annotation efforts when moving to different field or environmental
+approach in the domain for crop/weed classification for agricultural robots,
+reducing the annotation efforts when moving to different fields or environmental
 conditions.
 
-In our approach, we compute pseudo ground truth labels using  unsupervised 
-segmentation then use those labels to estimate how new, unlabeled samples will 
+In our approach, we computed pseudo ground truth labels using unsupervised 
+segmentation and use those labels to estimate how new, unlabeled samples will 
 affect the weights of the CNN if selected for training. We select the training
-samples for user annotation based on the effect on the weights and refine the 
-network. We evaluated and verified the performance gain of our gradient-based 
-approach on two agricultural robotics datasets for weed detection. The datasets 
-reveal different characteristics from the data on which the network was pretrained.
-Our results show the effectiveness of our method as it produces higher
+samples for user annotation based on the estimated effect on the weights and use them to refine the 
+network. We evaluated  the performance gain of our gradient-based 
+approach on two agricultural  datasets for weed detection. The datasets 
+reveal different characteristics from the dataset on which the network was pretrained.
+Our results show the effectiveness of our method as it produces higher semantic segmentation
 accuracies with a smaller number of training samples, compared to random sampling as
 well as uncertainty-based approaches for selecting samples for annotation. As as result
 of that, the effort in human annotation is considerably reduced without compromising
