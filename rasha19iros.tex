@@ -208,6 +208,7 @@ Different to these works, we experiment with approaches that directly measure ho
 
 
     \begin{figure*}
+      \vspace{1em}
     \centering
     \includegraphics[scale=0.9]{pics/output_system_overview.pdf}
    		\caption{Overview figure of our system. We first perform very weakly supervised segmentation to obtain pseudo ground truth. Given the labels and different measures produced by the network, we rank the unlabeled samples and pick them accordingly for annotation. These are then used to refine the network.}
@@ -305,6 +306,7 @@ The datasets we used were acquired with a Bosch Deepfield Robotics BoniRob UGV i
 
 
     \begin{table}
+       \vspace{1em}
         \centering
         \caption{Datasets Statistics of Crop and Weed Plants}
         \begin{tabular}{@{}lccccc@{}} 
@@ -396,7 +398,7 @@ We follow the approach of \cite{milioto2018real} and split the new dataset into 
 
     \begin{figure}
     \centering
-    \vspace{-1em}
+ %   \vspace{-1em}
     \includegraphics[width=\linewidth]{pics/pw_iou_stuttgart.pdf}
    		\caption{Pixel-wise mean IoU on the Stuttgart dataset.}
 		\label{fig:iou_stuttgart}    		
@@ -405,7 +407,7 @@ We follow the approach of \cite{milioto2018real} and split the new dataset into 
    
     \begin{figure}
     \centering
-    \vspace{-1em}
+ %   \vspace{-1em}
     \includegraphics[width=\linewidth]{pics/pw_iou_zurich.pdf}
    		\caption{Pixel-wise mean IoU on the Zurich dataset.}
 		\label{fig:iou_zurich}    		
@@ -429,102 +431,8 @@ As the model is trained on more and more samples, the accuracy plateaus as is ex
 The gradient norm method shows a consistent improvement over other methods for different number of samples and across the two datasets, confirming that samples that might have a larger influence on the weights are more valuable for annotation, as the network can benefit more from them.
 
 We combined the idea of gradient-based selection with two alternative approaches to achieving diversity in the selected images: Picking on a log-space scale, or projecting out gradients that have been selected previously. In our experiments, both strategies performed well. Our selection scheme might be improved further by adding a mechanism to ensure that selected images are representative of a larger subset in the overall dataset. We plan to investigate this in our future work.
- 
- %  \begin{subfigure}[b]{0.49\linewidth}
 
-    
 
-   
-   
-%          \begin{table}
-%        \centering
-%        \caption{asdasd}
-%        \begin{tabular}{@{}lcccccc@{}} 
-%            \toprule
-%              Approach & Weed & Crop & Weed & Crop & Weed & Crop \\ 
-%            \midrule 
-%    		  Random & 2.0 & 1.5 & 0.4095 & 0.7278 & 0.4851 & 0.6946  \\ \addlinespace
-%    		  Uncertainty & 2.0 & 1.5 & 0.5580 & 0.6646 & 0.2711 & 0.8880  \\ \addlinespace
-%    		  Loss & 2.0 & 1.5 & 0.5331 & 0.8025 & 0.6179 & 0.8112  \\ \addlinespace
-%    		  Gradient Norm & 2.0 & 1.5 & 0.5970 & 0.8259 & 0.6136 & 0.8402  \\ \addlinespace
-%    		  Gradient Projection & 2.0 & 1.5 & 0. & 0. & 0. & 0.  \\ 
-%            \bottomrule
-%        \end{tabular}
-%        \label{tab:Pixelwise}
-%    %       \vspace{10em}
-%    \end{table}
-%   
-   
-   
-A more detailed breakdown of the methods performance is shown in tables \ref{tab:pixel_wise_10_stuttgart} and \ref{tab:object_wise_10_stuttgart}. Table \ref{tab:pixel_wise_10_stuttgart} shows the pixel-wise precision and recall on the Stuttgart dataset after selecting the first 10 samples. Both methods, Gradient Norm and Gradient Projection have a high recall and precision of the crop class without degrading those of the weed class. The object-wise performance in Table \ref{tab:object_wise_10_stuttgart} further illustrates the effectiveness of these methods. Gradient Norm and Gradient Projection produce high precision and recall for both classes. The Uncertainty-based method, on the other hand, shows a large imbalance of performance on the two classes.
-   
-   
-   
-       \begin{table}
-        \centering
-        \caption{Pixel-wise precision and recall on the Stuttgart dataset after selecting the first 10 samples}
-        \begin{tabular}{@{}lcccc@{}} 
-            \toprule
-            & \multicolumn{2}{c}{Precision} & \multicolumn{2}{c}{Recall}\\ 
-           \cmidrule{2-5} 
-               & Weed & Crop & Weed & Crop \\ 
-            \midrule 
-    		  Random & \textit{0.4095} & 0.7278 & 0.4851 & \textit{0.6946}  \\ \addlinespace
-    		  Uncertainty & 0.5580 & \textit{0.6646} & \textit{0.2711} & \textbf{0.8880}  \\ \addlinespace
-    		  Loss & 0.5331 & 0.8025 & 0.6179 & 0.8112  \\ \addlinespace
-    		  Gradient Norm & \textbf{0.5970} & 0.8259 & 0.6136 & 0.8402  \\ \addlinespace
-    		  Gradient Projection & 0.5745 & \textbf{0.8365} & \textbf{0.6564} & 0.8212  \\ 
-            \bottomrule
-        \end{tabular}
-        \label{tab:pixel_wise_10_stuttgart}
-    %       \vspace{10em}
-    \end{table}
-   
-   
-   
-   
-          \begin{table}
-        \centering
-        \caption{Object-wise precision and recall on the Stuttgart dataset after selecting the first 10 samples}
-        \begin{tabular}{@{}lcccc@{}} 
-            \toprule
-            & \multicolumn{2}{c}{Precision} & \multicolumn{2}{c}{Recall}\\ 
-           \cmidrule{2-5} 
-               & Weed & Crop & Weed & Crop \\ 
-            \midrule 
-    		  Random & \textit{0.8723} & 0.5740 & 0.6587 & \textit{0.6474}  \\ \addlinespace
-    		  Uncertainty & \textbf{0.9476} & \textit{0.4586} & \textit{0.4919} & \textbf{0.8854}  \\ \addlinespace
-    		  Loss & 0.9005 & 0.6898 & 0.7811 & 0.7351  \\ \addlinespace
-    		  Gradient Norm & 0.9090 & \textbf{0.7390} & 0.7970 & 0.7536  \\ \addlinespace
-    		  Gradient Projection & 0.9030 & 0.7308 & \textbf{0.8289} & 0.7375  \\ 
-            \bottomrule
-        \end{tabular}
-        \label{tab:object_wise_10_stuttgart}
-    %       \vspace{10em}
-    \end{table}
-   
-   
-  To analyze the samples picked by the gradient based approach, we plot the t-distributed Stochastic Neighbor Embedding (t-SNE) of the gradients in Figure \ref{fig:tsne}. Each circle in the plot denotes the 2-D embedding of the gradients of a single image before picking the first 10 samples. Red circles in the figure denote images selected by the Gradient Norm method. Points in the bottom left have a large norm of gradients, while the point in the upper left has the lowest norm of the gradient. Given the log-spacing of the selected samples, it can be seen that it more densely selects images that the network finds difficult, and the other selected points are more spread out. Figure \ref{fig:tsne_proj} shows the points selected with the gradient projection method. Again we can see that most of the points selected are those with a higher gradient of the norm and the others are spread out across the embedding. For future work, we plan to investigate how this embedding can be further exploited to pick the best samples. 
-  
-       \begin{figure}
-    \vspace{-1em} 
-    \centering
-    \includegraphics[width=\linewidth]{pics/tsne_grad_norm.pdf}
-   		\caption{t-SNE of the images gradients on the Stuttgart dataset. The first 10 samples selected by the gradient norm method are shown in red.}
-		\label{fig:tsne}    		
- %   \vspace{1em}
-   \end{figure}
-   
-   
-   
-          \begin{figure}
-%    \vspace{1em} 
-    \centering
-    \includegraphics[width=\linewidth]{pics/tsne_grad_projection.pdf}
-   		\caption{t-SNE of the images gradients on the Stuttgart dataset. The first 10 samples selected by the gradient projection method are shown in red.}
-		\label{fig:tsne_proj}    		
- %   \vspace{1em}
-   \end{figure}
 
 
     \begin{table}
@@ -547,7 +455,6 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
             \bottomrule
         \end{tabular}
         \label{tab:stuttgart}
-    %       \vspace{10em}
     \end{table}
    
        
@@ -572,9 +479,88 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
             \bottomrule
         \end{tabular}
         \label{tab:zurich}
+                  \vspace{-1em}
     \end{table}
 
 
+
+    
+
+  
+   
+A more detailed breakdown of the methods performance is shown in tables \ref{tab:pixel_wise_10_stuttgart} and \ref{tab:object_wise_10_stuttgart}. Table \ref{tab:pixel_wise_10_stuttgart} shows the pixel-wise precision and recall on the Stuttgart dataset after selecting the first 10 samples. Both methods, Gradient Norm and Gradient Projection have a high recall and precision of the crop class without degrading those of the weed class. The object-wise performance in Table \ref{tab:object_wise_10_stuttgart} further illustrates the effectiveness of these methods. Gradient Norm and Gradient Projection produce high precision and recall for both classes. The Uncertainty-based method, on the other hand, shows a large imbalance of performance on the two classes.
+   
+   
+   
+       \begin{table}
+        \vspace{1em}
+        \centering
+        \caption{Pixel-wise precision and recall on the Stuttgart dataset after selecting the first 10 samples}
+        \begin{tabular}{@{}lcccc@{}} 
+            \toprule
+            & \multicolumn{2}{c}{Precision} & \multicolumn{2}{c}{Recall}\\ 
+           \cmidrule{2-5} 
+               & Weed & Crop & Weed & Crop \\ 
+            \midrule 
+    		  Random & \textit{0.4095} & 0.7278 & 0.4851 & \textit{0.6946}  \\ \addlinespace
+    		  Uncertainty & 0.5580 & \textit{0.6646} & \textit{0.2711} & \textbf{0.8880}  \\ \addlinespace
+    		  Loss & 0.5331 & 0.8025 & 0.6179 & 0.8112  \\ \addlinespace
+    		  Gradient Norm & \textbf{0.5970} & 0.8259 & 0.6136 & 0.8402  \\ \addlinespace
+    		  Gradient Projection & 0.5745 & \textbf{0.8365} & \textbf{0.6564} & 0.8212  \\ 
+            \bottomrule
+        \end{tabular}
+        \label{tab:pixel_wise_10_stuttgart}
+    %       \vspace{10em}
+    \end{table}
+   
+   
+   
+   
+       \begin{table}
+         \vspace{1em}
+        \centering
+        \caption{Object-wise precision and recall on the Stuttgart dataset after selecting the first 10 samples}
+        \begin{tabular}{@{}lcccc@{}} 
+            \toprule
+            & \multicolumn{2}{c}{Precision} & \multicolumn{2}{c}{Recall}\\ 
+           \cmidrule{2-5} 
+               & Weed & Crop & Weed & Crop \\ 
+            \midrule 
+    		  Random & \textit{0.8723} & 0.5740 & 0.6587 & \textit{0.6474}  \\ \addlinespace
+    		  Uncertainty & \textbf{0.9476} & \textit{0.4586} & \textit{0.4919} & \textbf{0.8854}  \\ \addlinespace
+    		  Loss & 0.9005 & 0.6898 & 0.7811 & 0.7351  \\ \addlinespace
+    		  Gradient Norm & 0.9090 & \textbf{0.7390} & 0.7970 & 0.7536  \\ \addlinespace
+    		  Gradient Projection & 0.9030 & 0.7308 & \textbf{0.8289} & 0.7375  \\ 
+            \bottomrule
+        \end{tabular}
+        \label{tab:object_wise_10_stuttgart}
+           \vspace{-2em}
+    \end{table}
+   
+   
+  To analyze the samples picked by the gradient based approach, we plot the t-distributed Stochastic Neighbor Embedding (t-SNE) of the gradients in Figure \ref{fig:tsne}. Each circle in the plot denotes the 2-D embedding of the gradients of a single image before picking the first 10 samples. Red circles in the figure denote images selected by the Gradient Norm method. Points in the bottom left have a large norm of gradients, while the point in the upper left has the lowest norm of the gradient. Given the log-spacing of the selected samples, it can be seen that it more densely selects images that the network finds difficult, and the other selected points are more spread out. Figure \ref{fig:tsne_proj} shows the points selected with the gradient projection method. Again we can see that most of the points selected are those with a higher gradient of the norm and the others are spread out across the embedding. For future work, we plan to investigate how this embedding can be further exploited to pick the best samples. 
+  
+       \begin{figure}
+     \vspace{-2em} 
+    \centering
+    \includegraphics[width=\linewidth]{pics/tsne_grad_norm.pdf}
+   		\caption{t-SNE of the images gradients on the Stuttgart dataset. The first 10 samples selected by the gradient norm method are shown in red.}
+		\label{fig:tsne}    		
+  %   \vspace{-1em}
+   \end{figure}
+   
+
+%   
+%          \begin{figure}
+%%    \vspace{1em} 
+%    \centering
+%    \includegraphics[scale=0.3]{pics/tsne_grad_projection.pdf}
+%   		\caption{t-SNE of the images gradients on the Stuttgart dataset. The first 10 samples selected by the gradient projection method are shown in red.}
+%		\label{fig:tsne_proj}    		
+%     \vspace{-1em}
+%   \end{figure}
+%
+%
 
 
 
