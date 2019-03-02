@@ -255,9 +255,10 @@ To infer the pixel-wise semantic segmentation of a new image, the network comput
 \begin{align}
 u(\bold{x}) &= \frac{1}{N} \sum_{i=1}^N \max_c p(c|x_i),
 \end{align}  
+
 where $x_i$ is pixel $i$ in the image and $c$ is the predicted class.
 
-We then sort the images based on the computed confidence measure and select samples from the ranking evenly on a log scale, to achieve diversity while giving preference to ones with higher uncertainty. The selected images and their manual segmentations are used to refine the network for use on a new dataset. In a pilot experiment, the log scale selection was found to yield better results than selecting only samples with the highest uncertainty. It is used in the following methods as well.
+We then sort the images based on the computed uncertainty measure and pick the images accordingly to refine the network on a new dataset. The images are selected on a log-space scale, rather than selecting those with the highest uncertainty, as we found out that the network learns better when presented with diverse samples. The log-space approach is used in the following methods as well.
 
 \subsection{Loss} \label{sec:loss}
 
@@ -543,7 +544,7 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
      \vspace{-2em} 
     \centering
     \includegraphics[width=\linewidth]{pics/tsne_grad_norm.pdf}
-   		\caption{t-SNE of the images gradients on the Stuttgart dataset. The first 10 samples selected by the gradient norm method are shown in red.}
+   		\caption{t-SNE of the images gradients on the Stuttgart dataset. The first 10 samples selected by the gradient norm method are shown in yellow while the ones selected by the gradient projection are shown in red.}
 		\label{fig:tsne}    		
   %   \vspace{-1em}
    \end{figure}
