@@ -430,10 +430,7 @@ As the model is trained on more and more samples, the accuracy plateaus as is ex
 
 The gradient norm method shows a consistent improvement over other methods for different number of samples and across the two datasets, confirming that samples that might have a larger influence on the weights are more valuable for annotation, as the network can benefit more from them.
 
-We combined the idea of gradient-based selection with two alternative approaches to achieving diversity in the selected images: Picking on a log-space scale, or projecting out gradients that have been selected previously. In our experiments, both strategies performed well. Our selection scheme might be improved further by adding a mechanism to ensure that selected images are representative of a larger subset in the overall dataset. We plan to investigate this in our future work.
-
-
-
+We combined the idea of gradient-based selection with two alternative approaches to achieving diversity in the selected images: Picking on a log scale, or projecting out gradients that have been selected previously. In our experiments, both strategies performed well. To further analyze them, we plot the t-distributed Stochastic Neighbor Embedding (t-SNE) of the gradients in Figure~\ref{fig:tsne}. Each circle denotes the 2-D embedding of the gradient of a single image before picking the first 10 samples. Samples selected by the gradient norm are shown in yellow; ones selected by the gradient projection method are shown in red. The plots illustrate that both approaches achieve diversity despite the fact that the strongest gradients cluster together, near the bottom left. However, the fact that the gradient projection method selects many points at the boundary of the distribution suggests that it might be improved further by adding a mechanism to ensure that selected images are representative of a larger subset in the overall dataset. We plan to investigate this in our future work.
 
     \begin{table}
            \vspace{1em}
@@ -484,7 +481,14 @@ We combined the idea of gradient-based selection with two alternative approaches
     \end{table}
 
 
-
+       \begin{figure}
+     \vspace{-2em} 
+    \centering
+    \includegraphics[width=\linewidth]{pics/tsne_grad_norm.pdf}
+   		\caption{t-SNE of the images gradients on the Stuttgart dataset. The first 10 samples selected by the gradient norm method are shown in yellow while the ones selected by the gradient projection are shown in red.}
+		\label{fig:tsne}    		
+  %   \vspace{-1em}
+   \end{figure}
     
 
   
@@ -538,18 +542,7 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
            \vspace{-2em}
     \end{table}
    
-   
-  To analyze the samples picked by the gradient based approach, we plot the t-distributed Stochastic Neighbor Embedding (t-SNE) of the gradients in Figure \ref{fig:tsne}. Each circle in the plot denotes the 2-D embedding of the gradients of a single image before picking the first 10 samples. Red circles in the figure denote images selected by the Gradient Norm method. Points in the bottom left have a large norm of gradients, while the point in the upper left has the lowest norm of the gradient. Given the log-spacing of the selected samples, it can be seen that it more densely selects images that the network finds difficult, and the other selected points are more spread out. Figure \ref{fig:tsne_proj} shows the points selected with the gradient projection method. Again we can see that most of the points selected are those with a higher gradient of the norm and the others are spread out across the embedding. For future work, we plan to investigate how this embedding can be further exploited to pick the best samples. 
-  
-       \begin{figure}
-     \vspace{-2em} 
-    \centering
-    \includegraphics[width=\linewidth]{pics/tsne_grad_norm.pdf}
-   		\caption{t-SNE of the images gradients on the Stuttgart dataset. The first 10 samples selected by the gradient norm method are shown in yellow while the ones selected by the gradient projection are shown in red.}
-		\label{fig:tsne}    		
-  %   \vspace{-1em}
-   \end{figure}
-   
+    
 
 %   
 %          \begin{figure}
