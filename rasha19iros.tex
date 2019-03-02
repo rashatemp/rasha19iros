@@ -477,30 +477,16 @@ We combined the idea of gradient-based selection with two alternative approaches
             \bottomrule
         \end{tabular}
         \label{tab:zurich}
-                  \vspace{-1em}
+   %               \vspace{-1em}
     \end{table}
-
-
-       \begin{figure}
-     \vspace{-2em} 
-    \centering
-    \includegraphics[width=\linewidth]{pics/tsne_grad_norm.pdf}
-   		\caption{t-SNE of the images gradients on the Stuttgart dataset. The first 10 samples selected by the gradient norm method are shown in yellow while the ones selected by the gradient projection are shown in red.}
-		\label{fig:tsne}    		
-  %   \vspace{-1em}
-   \end{figure}
-    
-
   
-   
-A more detailed breakdown of the methods performance is shown in tables \ref{tab:pixel_wise_10_stuttgart} and \ref{tab:object_wise_10_stuttgart}. Table \ref{tab:pixel_wise_10_stuttgart} shows the pixel-wise precision and recall on the Stuttgart dataset after selecting the first 10 samples. Both methods, Gradient Norm and Gradient Projection have a high recall and precision of the crop class without degrading those of the weed class. The object-wise performance in Table \ref{tab:object_wise_10_stuttgart} further illustrates the effectiveness of these methods. Gradient Norm and Gradient Projection produce high precision and recall for both classes. The Uncertainty-based method, on the other hand, shows a large imbalance of performance on the two classes.
-   
-   
-   
+
+
+
        \begin{table}
         \vspace{1em}
         \centering
-        \caption{Pixel-wise precision and recall on the Stuttgart dataset after selecting the first 10 samples}
+      \caption{Pixel-wise precision and recall on the Stuttgart dataset after selecting the first 10 samples. The highest values are in bold and the lowest in italics. The uncertainty-based method shows a large imbalance in performance on the two classes.}
         \begin{tabular}{@{}lcccc@{}} 
             \toprule
             & \multicolumn{2}{c}{Precision} & \multicolumn{2}{c}{Recall}\\ 
@@ -519,12 +505,12 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
     \end{table}
    
    
-   
+
    
        \begin{table}
-         \vspace{1em}
+     %    \vspace{1em}
         \centering
-        \caption{Object-wise precision and recall on the Stuttgart dataset after selecting the first 10 samples}
+        \caption{Object-wise precision and recall on the Stuttgart dataset after selecting the first 10 samples. The highest values are in bold and the lowest in italics. The uncertainty-based method shows a large imbalance in performance on the two classes.}
         \begin{tabular}{@{}lcccc@{}} 
             \toprule
             & \multicolumn{2}{c}{Precision} & \multicolumn{2}{c}{Recall}\\ 
@@ -539,11 +525,23 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
             \bottomrule
         \end{tabular}
         \label{tab:object_wise_10_stuttgart}
-           \vspace{-2em}
+  %         \vspace{-2em}
     \end{table}
    
-    
 
+    
+                   \begin{figure}
+   %  \vspace{-2em} 
+    \centering
+    \includegraphics[width=\linewidth]{pics/tsne_grad_norm.pdf}
+   		\caption{t-SNE of the images gradients on the Stuttgart dataset. The first 10 samples selected by the gradient norm method are shown in yellow while the ones selected by the gradient projection are shown in red.}
+		\label{fig:tsne}    		
+  %   \vspace{-1em}
+   \end{figure}
+    
+A more detailed breakdown of the methods performance is shown in tables \ref{tab:pixel_wise_10_stuttgart} and \ref{tab:object_wise_10_stuttgart}. Table \ref{tab:pixel_wise_10_stuttgart} shows the pixel-wise precision and recall on the Stuttgart dataset after selecting the first 10 samples. Both methods, Gradient Norm and Gradient Projection have a high recall and precision of the crop class without degrading those of the weed class. The object-wise performance in Table \ref{tab:object_wise_10_stuttgart} further illustrates the effectiveness of these methods. Gradient Norm and Gradient Projection produce high precision and recall for both classes. The Uncertainty-based method, on the other hand, shows a large imbalance of performance on the two classes.
+   
+   
 %   
 %          \begin{figure}
 %%    \vspace{1em} 
@@ -561,7 +559,7 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
 
 
 
-\addtolength{\textheight}{-0.4cm}   % This command serves to balance the column lengths
+%\addtolength{\textheight}{-0.4cm}   % This command serves to balance the column lengths
 %                                   % on the last page of the document manually. It shortens
 %                                   % the textheight of the last page by a suitable amount.
 %                                   % This command does not take effect until the next page
@@ -595,7 +593,7 @@ well as uncertainty-based approaches for selecting samples for annotation. As as
 of that, the effort in human annotation is considerably reduced without compromising
 performance.
  
-
+     %    \vspace{1em}
 %%\bibliographystyle{IEEEtran}
 \bibliographystyle{plain}
 
