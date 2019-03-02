@@ -169,11 +169,11 @@ random sampling for annotation as well as uncertainty-based approaches.
 \section{RELATED WORK}
 \label{sec:related}
 
-Several works focusing on the elimination or reduction of herbicide use
-through the incorporation of autonomous ground robots in our crop fields have
+Several works focusing on the elimination or reduction of herbicide
+through the incorporation of autonomous ground robots in crop fields have
 been introduced to the community in the last years~\cite{ducket2018arxiv, liebisch2016wslw, mccool2018ral}.
 A key component of each of these unmanned platforms is a core perception system that
-has the ability to accurately distinguish value crops from weeds in order to effectively
+has the ability to accurately distinguish crops from weeds in order to effectively
 and selectively apply the desired individual treatment~\cite{ lottes2018iros, mccool2017ral,milioto2017uavg,milioto2018real, sa2018rs}.
 These systems allow autonomous robots to perform actuation in the fields without human supervision, treating each plant individually.
 All of the works referenced, however, are based on supervised learning approaches which take large amounts of pixel-accurate hand-labeled images for training. 
@@ -204,7 +204,7 @@ Different to these works, we experiment with approaches that directly measure ho
 
 
 
-\section{Segmentation Framework} \label{sec:approach}
+\section{Segmentation Framework} \label{sec:seg_framework}
 
 
     \begin{figure*}
@@ -244,7 +244,7 @@ As input to our network we only use the RGB channels.
 %25 convolutional layers.
 
 
-\section{Effective Sample Selection}
+\section{Effective Sample Selection}\label{sec:approach}
 
 We experimented with different approaches to select samples. The baseline is randomly selecting samples for annotation in batches of 10. The other approaches include selecting samples driven by the uncertainty of the network, the training loss, and the weights gradients of the network.   
 
@@ -275,7 +275,7 @@ For this approach and the following one, we pick those samples for annotation th
 \begin{align}
 n_g(\bold{x}) &=  \left\lVert \nabla_{w_f} \mathcal{L}(\bold{x}) \right\rVert,
 \end{align}  
-where $w_f$ are the weights of the final layer.
+where $w$ are the weights of the final two layers.
 
 The images are sorted based on this measure and we pick samples on a log-space scale afterwards.
 
@@ -576,7 +576,7 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
 In this paper, we proposed an active learning approach that supports semantic
 segmentation in new environments by effectively selecting samples for user
 annotation with the goal of minimizing the annotation effort. We applied our
-approach in the domain for crop/weed classification for agricultural robots,
+approach in the domain of crop/weed classification for agricultural robots,
 reducing the annotation efforts when moving to different fields or environmental
 conditions.
 
@@ -589,7 +589,7 @@ approach on two agricultural  datasets for weed detection. The datasets
 reveal different characteristics from the dataset on which the network was pretrained.
 Our results show the effectiveness of our method as it produces higher semantic segmentation
 accuracies with a smaller number of training samples, compared to random sampling as
-well as uncertainty-based approaches for selecting samples for annotation. As as result
+well as uncertainty-based approaches for selecting samples for annotation. As a result
 of that, the effort in human annotation is considerably reduced without compromising
 performance.
  
