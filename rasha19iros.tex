@@ -12,6 +12,8 @@
 \usepackage[noend]{algpseudocode}
 \usepackage[activate=alltext]{microtype}
 \usepackage{rotating}
+\usepackage{makecell}
+
 
 
 \usepackage{subcaption} % enables use multiple figures in a figure
@@ -132,15 +134,15 @@ on it, we address the problem of transferring this knowledge to new fields with
 minimum effort.  Datasets from different fields reveal different crop and weed
 statistics. They almost  always differ by soil type, weather condition, or
 various small objects that can be found  on the ground, such as stones, dried
-vegetation, or marks from agricultural machines,  i.e. patterns that are
+vegetation, or marks from agricultural machines,  i.e., patterns that are
 neither crop nor weed. Additionally, the robot can acquire  images of plants
 at a certain growth stage in one field, while the growth state on the  target
 field is different. Lastly, artifacts such as contrast changes can be found in
 the camera images captured from the various locations.  These conditions make
 it difficult to simply reuse a previously trained network from one  field and
-infer the labels on another, see also~\cite{lottes2018ral,lottes2017iros}. Thus, 
+infer the labels on another~\cite{lottes2018ral,lottes2017iros}. Thus, 
 the network has to be
-re-trained on  annotated images taken in the new field and we propose an
+re-trained on  annotated images taken in the new field. We propose an
 active learning  approach to select samples that the network will most benefit
 from and will generalize  to the rest of the unlabeled data while minimizing
 the effort of annotating images.
@@ -153,23 +155,25 @@ samples from  a different domain, the samples that the network performs most
 poorly on, especially at the  beginning, will have the largest weight
 gradients and consequently the largest impact on the  weights. This strategy might appear to be circular, since computing gradients already requires class labels at a stage where are still selecting images for labeling.  We circumvent this by using pseudo ground truth that we obtain with very weakly supervised segmentation. Our approach
 selects samples in batches, each time refining the network, then computing a
-new  ranking of the remaining unlabeled data. The best samples are then selected and the
-network is refined again.  We
-implemented and evaluated our framework on  agricultural datasets~\cite{chebrolu2017agricultural} 
+new  ranking of the unlabeled data. The best samples are then selected and the
+network is re-trained. To compute the real gradients, corresponding ground
+truth data is needed. Thus, in our approach, we approximate the ground truth as the result of unsupervised segmentation to estimate the gradient.  We
+evaluated our framework on  agricultural datasets~\cite{chebrolu2017agricultural} 
 with different characteristics.  Our results indicate that our method produces a
-higher accuracy on both datasets with a lower  number of samples compared to
-random sampling for annotation as well as uncertainty based approaches.
+higher accuracy on the datasets with a fewer  number of samples compared to
+random sampling for annotation as well as uncertainty-based approaches.
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{RELATED WORK}
 \label{sec:related}
 
-Several works focusing on the elimination or reduction of herbicide use
-through the incorporation of autonomous ground robots in our crop fields have
+Several works focusing on the elimination or reduction of herbicide use,
+through the incorporation of autonomous ground robots in crop fields, have
 been introduced to the community in the last years~\cite{ducket2018arxiv, liebisch2016wslw, mccool2018ral}.
 A key component of each of these unmanned platforms is a core perception system that
-has the ability to accurately distinguish value crops from weeds in order to effectively
+has the ability to accurately distinguish crops from weeds in order to effectively
 and selectively apply the desired individual treatment~\cite{ lottes2018iros, mccool2017ral,milioto2017uavg,milioto2018real, sa2018rs}.
 These systems allow autonomous robots to perform actuation in the fields without human supervision, treating each plant individually.
 All of the works referenced, however, are based on supervised learning approaches which take large amounts of pixel-accurate hand-labeled images for training. 
@@ -200,10 +204,11 @@ Different to these works, we experiment with approaches that directly measure ho
 
 
 
-\section{Segmentation Framework} \label{sec:approach}
+\section{Segmentation Framework} \label{sec:seg_framework}
 
 
     \begin{figure*}
+      \vspace{1em}
     \centering
     \includegraphics[scale=0.9]{pics/output_system_overview.pdf}
    		\caption{Overview figure of our system. We first perform very weakly supervised segmentation to obtain pseudo ground truth. Given the labels and different measures produced by the network, we rank the unlabeled samples and pick them accordingly for annotation. These are then used to refine the network.}
@@ -215,7 +220,7 @@ Different to these works, we experiment with approaches that directly measure ho
 We use Bonnet~\cite{milioto2018bonnet} to train a model on the Bonn sugar beet dataset~\cite{chebrolu2017agricultural}. We then refine the trained model on other datasets by incrementally selecting batches of samples. The datasets differ in their crop/weed statistics and the images acquired with the cameras also differ in their illumination. Therefore, simply running the trained model to segment the vegetation in other fields does not work. We briefly first describe the architecture of the network used, then present different methods to select samples for refinement that we experimented with.
 
 
-Bonnet is an open-source deep network framework developed by \cite{milioto2018bonnet}. It was designed with efficiency in mind so that it is able to run at 20 Hz. The network is based on SegNet \cite{badrinarayanan2017segnet} and ENet \cite{paszke2016enet}. It has an encoder-decoder structure with a total of 25 [5x5] convolutional layers. It uses batch normalization, residual connections, and ReLU as the non-linearity layer. 
+Bonnet is an open-source deep network framework developed by \cite{milioto2018bonnet}. It was designed with efficiency in mind so that it is able to run at 20 Hz. The network is based on SegNet \cite{badrinarayanan2017segnet} and ENet \cite{paszke2016enet}. It has an encoder-decoder structure with a total of 25 [5x5] convolutional layers. It uses batch normalization, residual connections, ReLU as the non-linearity layer, and the focal loss function \cite{DBLP:conf/iccv/LinGGHD17}.
 
 To speed up prediction, the authors replace the [5x5] conventional convolutional layer with a mix of [1x1] convolutions and separable [1x5] and [5x1] convolutions. Additionally, instead of using the relatively more expensive transposed convolutions in the decoder, unpooling is done using the respective pooling indices in the encoder part.
 
@@ -239,9 +244,9 @@ As input to our network we only use the RGB channels.
 %25 convolutional layers.
 
 
-\section{Effective Sample Selection}
+\section{Effective Sample Selection}\label{sec:approach}
 
-We experimented with different approaches to select samples. The baseline is randomly selecting samples for annotation in batches of 10. The other approaches include selecting samples driven by the uncertainty of the network, the training loss, and the weights gradients of the network.   
+We experimented with different approaches to select samples. The baseline is randomly selecting samples for annotation in batches of 10. The other approaches include selecting samples driven by the uncertainty of the network, the training loss, and the weight gradients of the network.   
 
 
 \subsection{Uncertainty}
@@ -257,7 +262,7 @@ We then sort the images based on the computed uncertainty measure and pick the i
 
 \subsection{Loss} \label{sec:loss}
 
-The loss of the network is an indication of the segmentation error. Given that training neural networks with backpropagation is driven by the loss, it also provides a useful cue as to which samples the network will most benefit from. We compute the loss based on a pseudo-ground truth, consisting of a foreground-background segmentation that we achieve using k-means clustering on the RGB channels.
+The loss of the network is an indication of the segmentation error. Given that training neural networks with backpropagation is driven by the loss, it also provides a useful cue as to which samples the network will most benefit from. We compute the focal loss \cite{DBLP:conf/iccv/LinGGHD17} based on a pseudo-ground truth, consisting of a foreground-background segmentation that we achieve using k-means clustering on the RGB channels.
 
 Initially, we use k-means to determine 20 cluster representatives from 10 randomly selected images. After viewing a single image that contains all 20 clusters, a human annotator chooses which clusters represent vegetation. In our experiments, it was enough to select two clusters. In accordance with previously used terminology \cite{zhang2018self}, we refer to this step as being very weakly supervised, since it only involves inspecting a single image. 
 
@@ -270,7 +275,7 @@ For this approach and the following one, we pick those samples for annotation th
 \begin{align}
 n_g(\bold{x}) &=  \left\lVert \nabla_{w_f} \mathcal{L}(\bold{x}) \right\rVert,
 \end{align}  
-where $w_f$ are the weights of the final layer.
+where $w$ are the weights of the final two layers.
 
 The images are sorted based on this measure and we pick samples on a log-space scale afterwards.
 
@@ -301,6 +306,7 @@ The datasets we used were acquired with a Bosch Deepfield Robotics BoniRob UGV i
 
 
     \begin{table}
+       \vspace{1em}
         \centering
         \caption{Datasets Statistics of Crop and Weed Plants}
         \begin{tabular}{@{}lccccc@{}} 
@@ -392,7 +398,7 @@ We follow the approach of \cite{milioto2018real} and split the new dataset into 
 
     \begin{figure}
     \centering
-    \vspace{-1em}
+ %   \vspace{-1em}
     \includegraphics[width=\linewidth]{pics/pw_iou_stuttgart.pdf}
    		\caption{Pixel-wise mean IoU on the Stuttgart dataset.}
 		\label{fig:iou_stuttgart}    		
@@ -401,7 +407,7 @@ We follow the approach of \cite{milioto2018real} and split the new dataset into 
    
     \begin{figure}
     \centering
-    \vspace{-1em}
+ %   \vspace{-1em}
     \includegraphics[width=\linewidth]{pics/pw_iou_zurich.pdf}
    		\caption{Pixel-wise mean IoU on the Zurich dataset.}
 		\label{fig:iou_zurich}    		
@@ -418,50 +424,69 @@ Tables \ref{tab:stuttgart} and \ref{tab:zurich} show how our approach performs o
 
 %As can be seen from the result,
 
-A few observations can be made: the effect of the sampling method is more pronounced when only a few images are selected. Again, it can be seen that methods measuring the influence of the samples on the weighs perform better. For instance, training a model with 20 samples picked with the gradient norm method produces accuracies that can only be achieved when picking 60 samples with the random method, lowering the annotation effort considerably.
+A few observations can be made: the effect of the sampling method is more pronounced when only a few images are selected. Again, it can be seen that methods measuring the influence of the samples on the weights perform better. For instance, training a model with 20 samples picked with the gradient norm method produces accuracies that can only be achieved when picking 60 samples with the random method, lowering the annotation effort considerably.
 
 As the model is trained on more and more samples, the accuracy plateaus as is expected and the variation between the different methods decreases. It can be noted however that random sampling has a lower performance even with a greater number of images.
 
 The gradient norm method shows a consistent improvement over other methods for different number of samples and across the two datasets, confirming that samples that might have a larger influence on the weights are more valuable for annotation, as the network can benefit more from them.
 
-Projecting out the gradients iteratively seems to be a promising method. For small number of images, it performs best but then the improvement afterwards is not as noticeable. Investigating the images that are being chosen in the fourth row and beyond for this method, we hypothesize that although these images will force the network weights to change in orthogonal directions, they might not be representative of a larger subset of images in the dataset. We plan to investigate this further in the future. 
+We combined the idea of gradient-based selection with two alternative approaches to achieving diversity in the selected images: Picking on a log scale, or projecting out gradients that have been selected previously. In our experiments, both strategies performed well. To further analyze them, we plot the t-distributed Stochastic Neighbor Embedding (t-SNE) of the gradients in Figure~\ref{fig:tsne}. Each circle denotes the 2-D embedding of the gradient of a single image before picking the first 10 samples. Samples selected by the gradient norm are shown in yellow; ones selected by the gradient projection method are shown in red. The plots illustrate that both approaches achieve diversity despite the fact that the strongest gradients cluster together, near the bottom left. However, the fact that the gradient projection method selects many points at the boundary of the distribution suggests that it might be improved further by adding a mechanism to ensure that selected images are representative of a larger subset in the overall dataset. We plan to investigate this in our future work.
 
-
-
- 
- %  \begin{subfigure}[b]{0.49\linewidth}
-
-    
-
-   
-   
-%          \begin{table}
-%        \centering
-%        \caption{asdasd}
-%        \begin{tabular}{@{}lcccccc@{}} 
-%            \toprule
-%              Approach & Weed & Crop & Weed & Crop & Weed & Crop \\ 
-%            \midrule 
-%    		  Random & 2.0 & 1.5 & 0.4095 & 0.7278 & 0.4851 & 0.6946  \\ \addlinespace
-%    		  Uncertainty & 2.0 & 1.5 & 0.5580 & 0.6646 & 0.2711 & 0.8880  \\ \addlinespace
-%    		  Loss & 2.0 & 1.5 & 0.5331 & 0.8025 & 0.6179 & 0.8112  \\ \addlinespace
-%    		  Gradient Norm & 2.0 & 1.5 & 0.5970 & 0.8259 & 0.6136 & 0.8402  \\ \addlinespace
-%    		  Gradient Projection & 2.0 & 1.5 & 0. & 0. & 0. & 0.  \\ 
-%            \bottomrule
-%        \end{tabular}
-%        \label{tab:Pixelwise}
-%    %       \vspace{10em}
-%    \end{table}
-%   
-   
-   
-A more detailed breakdown of the methods performance is shown in tables \ref{tab:pixel_wise_10_stuttgart} and \ref{tab:object_wise_10_stuttgart}. Table \ref{tab:pixel_wise_10_stuttgart} shows the pixel-wise precision and recall on the Stuttgart dataset after selecting the first 10 samples. Both methods, Gradient Norm and Gradient Projection have a high recall and precision of the crop class without degrading those of the weed class. The object-wise performance in Table \ref{tab:object_wise_10_stuttgart} further illustrates the effectiveness of these methods. Gradient Norm and Gradient Projection produce high precision and recall for both classes. The Uncertainty-based method, on the other hand, shows a large imbalance of performance on the two classes.
-   
-   
-   
-       \begin{table}
+    \begin{table}
+           \vspace{1em}
         \centering
-        \caption{Pixel-wise precision and recall on the Stuttgart dataset after selecting the first 10 samples}
+        \caption{Object-wise Performance on the Stuttgart dataset. Each row shows the performance after selecting 10 samples with the different methods and refining the network.}
+        \begin{tabular}{@{}cccccc@{}} 
+            \toprule
+            \makecell{Samples \\ No.} & \makecell{Random} & \makecell{Uncertainty} & \makecell{Loss} & \makecell{Gradient \\ Norm} & \makecell{Gradient \\ Proj.} \\ 
+            \midrule 
+    		  10  & 0.6920 & 0.6437 & 0.7882 & 0.8040 & 0.8196 \\ \addlinespace
+    		  20  & 0.7402 & 0.8408 & 0.7769 & 0.8350 & 0.8404 \\ \addlinespace
+    		  30  & 0.8138 & 0.8359 & 0.7950 & 0.8461 & 0.8470 \\ \addlinespace
+    		  40  & 0.8254 & 0.8529 & 0.8555 & 0.8682 & 0.8252 \\ \addlinespace
+    		  50  & 0.8225 & 0.8529 & 0.8523 & 0.8599 & 0.8278 \\ \addlinespace
+    		  60  & 0.8308 & 0.8497 & 0.8596 & 0.8569 & 0.8384 \\ \addlinespace
+    		  70  & 0.8335 & 0.8542 & 0.8666 & 0.8622 & 0.8366 \\ \addlinespace
+    		  80  & 0.8321 & 0.8595 & 0.8455 & 0.8596 & 0.8386 \\ \addlinespace
+    		  90  & 0.8424 & 0.8565 & 0.8643 & 0.8639 & 0.8399 \\ \addlinespace
+    		 100  & 0.8394 & 0.8502 & 0.8638 & 0.8531 & 0.8529 \\    
+            \bottomrule
+        \end{tabular}
+        \label{tab:stuttgart}
+    \end{table}
+   
+       
+    
+        \begin{table}
+        \centering
+        \caption{Object-wise Performance on the Zurich dataset. Each row shows the performance after selecting 10 samples with the different methods and refining the network.}
+        \begin{tabular}{@{}cccccc@{}} 
+            \toprule
+            \makecell{Samples \\ No.} & \makecell{Random} & \makecell{Uncertainty} & \makecell{Loss} & \makecell{Gradient \\ Norm} & \makecell{Gradient \\ Proj.} \\ 
+            \midrule 
+    		  10  & 0.7552 & 0.6943 & 0.7697 & 0.8354 & 0.8025 \\ \addlinespace
+    		  20  & 0.7971 & 0.8281 & 0.8189 & 0.8768 & 0.8170 \\ \addlinespace
+    		  30  & 0.8591 & 0.8674 & 0.8321 & 0.8553 & 0.8299 \\ \addlinespace
+    		  40  & 0.8575 & 0.8690 & 0.8610 & 0.8711 & 0.8479 \\ \addlinespace
+    		  50  & 0.8593 & 0.8547 & 0.8636 & 0.8852 & 0.8784 \\ \addlinespace
+    		  60  & 0.8666 & 0.8737 & 0.8805 & 0.8827 & 0.8895 \\ \addlinespace
+    		  70  & 0.8601 & 0.8664 & 0.8880 & 0.8827 & 0.8878 \\ \addlinespace
+    		  80  & 0.8241 & 0.8869 & 0.8867 & 0.8897 & 0.8784 \\ \addlinespace
+    		  90  & 0.8476 & 0.8667 & 0.8812 & 0.8928 & 0.8871 \\ \addlinespace
+    		  100  & 0.7911 & 0.8700 &0.8873 & 0.8873 & 0.8805 \\    
+            \bottomrule
+        \end{tabular}
+        \label{tab:zurich}
+   %               \vspace{-1em}
+    \end{table}
+  
+
+
+
+       \begin{table}
+        \vspace{1em}
+        \centering
+      \caption{Pixel-wise precision and recall on the Stuttgart dataset after selecting the first 10 samples. The highest values are in bold and the lowest in italics. The uncertainty-based method shows a large imbalance in performance on the two classes.}
         \begin{tabular}{@{}lcccc@{}} 
             \toprule
             & \multicolumn{2}{c}{Precision} & \multicolumn{2}{c}{Recall}\\ 
@@ -480,18 +505,19 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
     \end{table}
    
    
+
    
-   
-          \begin{table}
+       \begin{table}
+     %    \vspace{1em}
         \centering
-        \caption{Object-wise precision and recall on the Stuttgart dataset after selecting the first 10 samples}
+        \caption{Object-wise precision and recall on the Stuttgart dataset after selecting the first 10 samples. The highest values are in bold and the lowest in italics. The uncertainty-based method shows a large imbalance in performance on the two classes.}
         \begin{tabular}{@{}lcccc@{}} 
             \toprule
             & \multicolumn{2}{c}{Precision} & \multicolumn{2}{c}{Recall}\\ 
            \cmidrule{2-5} 
                & Weed & Crop & Weed & Crop \\ 
             \midrule 
-    		  Random & \textit{0.8723} & 0.5740 & 0.6587 & 0.6474  \\ \addlinespace
+    		  Random & \textit{0.8723} & 0.5740 & 0.6587 & \textit{0.6474}  \\ \addlinespace
     		  Uncertainty & \textbf{0.9476} & \textit{0.4586} & \textit{0.4919} & \textbf{0.8854}  \\ \addlinespace
     		  Loss & 0.9005 & 0.6898 & 0.7811 & 0.7351  \\ \addlinespace
     		  Gradient Norm & 0.9090 & \textbf{0.7390} & 0.7970 & 0.7536  \\ \addlinespace
@@ -499,85 +525,41 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
             \bottomrule
         \end{tabular}
         \label{tab:object_wise_10_stuttgart}
-    %       \vspace{10em}
+  %         \vspace{-2em}
     \end{table}
    
-   
-  To analyze the samples picked by the gradient based approach, we plot the t-distributed Stochastic Neighbor Embedding (t-SNE) of the gradients in Figure \ref{fig:tsne}. Each circle in the plot denotes the 2-D embedding of the gradients of a single image before picking the first 10 samples. Red circles in the figure denote images selected by the Gradient Norm method. Points in the bottom left have a large norm of gradients, while the point in the upper left has the lowest norm of the gradient. Given the log-spacing of the selected samples, it can be seen that it more densely selects images that the network finds difficult, and the other selected points are more spread out. For future work, we plan to investigate how this embedding can be further exploited to pick the best samples.
-   
-       \begin{figure}
-    \vspace{-1em} 
+
+    
+                   \begin{figure}
+   %  \vspace{-2em} 
     \centering
     \includegraphics[width=\linewidth]{pics/tsne_grad_norm.pdf}
-   		\caption{t-SNE of the images gradients on the Stuttgart dataset. The first 10 samples selected by the gradient norm method are shown in red.}
+   		\caption{t-SNE of the images gradients on the Stuttgart dataset. The first 10 samples selected by the gradient norm method are shown in yellow while the ones selected by the gradient projection are shown in red.}
 		\label{fig:tsne}    		
- %   \vspace{1em}
+  %   \vspace{-1em}
    \end{figure}
-
-
-
-
-
-
-
-    \begin{table}
-        \centering
-        \caption{Object-wise Performance on the Stuttgart dataset. Each row shows the performance after selecting 10 samples with the different methods and refining the network.}
-        \begin{tabular}{@{}cccccc@{}} 
-            \toprule
-             \begin{sideways}Samples No.\end{sideways} & \begin{sideways}Random\end{sideways} & \begin{sideways}Uncertainty\end{sideways} & \begin{sideways}Loss\end{sideways} & \begin{sideways}Gradient Norm.\end{sideways} & \begin{sideways}Gradient Proj.\end{sideways} \\ 
-            \midrule 
-    		  10  & 0.6920 & 0.6437 & 0.7882 & 0.8040 & 0.8196 \\ \addlinespace
-    		  20  & 0.7402 & 0.8408 & 0.7769 & 0.8350 & 0.8404 \\ \addlinespace
-    		  30  & 0.8138 & 0.8359 & 0.7950 & 0.8461 & 0.8470 \\ \addlinespace
-    		  40  & 0.8254 & 0.8529 & 0.8555 & 0.8682 & 0.8252 \\ \addlinespace
-    		  50  & 0.8225 & 0.8529 & 0.8523 & 0.8599 & 0.8278 \\ \addlinespace
-    		  60  & 0.8308 & 0.8497 & 0.8596 & 0.8569 & 0.8384 \\ \addlinespace
-    		  70  & 0.8335 & 0.8542 & 0.8666 & 0.8622 & 0.8366 \\ \addlinespace
-    		  80  & 0.8321 & 0.8595 & 0.8455 & 0.8596 & 0.8386 \\ \addlinespace
-    		  90  & 0.8424 & 0.8565 & 0.8643 & 0.8639 & 0.8399 \\ \addlinespace
-    		 100  & 0.8394 & 0.8502 & 0.8638 & 0.8531 & 0.8529 \\    
-            \bottomrule
-        \end{tabular}
-        \label{tab:stuttgart}
-    %       \vspace{10em}
-    \end{table}
     
-    
-
-    
-    
-    
-        \begin{table}
-        \centering
-        \caption{Object-wise Performance on the Zurich dataset. Each row shows the performance after selecting 10 samples with the different methods and refining the network.}
-        \begin{tabular}{@{}cccccc@{}} 
-            \toprule
-             \begin{sideways}Samples No.\end{sideways} & \begin{sideways}Random\end{sideways} & \begin{sideways}Uncertainty\end{sideways} & \begin{sideways}Loss\end{sideways} & \begin{sideways}Gradient Norm.\end{sideways} & \begin{sideways}Gradient Proj.\end{sideways}\\ 
-            \midrule 
-    		  10  & 0.7552 & 0.6943 & 0.7697 & 0.8354 & 0.8025 \\ \addlinespace
-    		  20  & 0.7971 & 0.8281 & 0.8189 & 0.8768 & 0.8170 \\ \addlinespace
-    		  30  & 0.8591 & 0.8674 & 0.8321 & 0.8553 & 0.8299 \\ \addlinespace
-    		  40  & 0.8575 & 0.8690 & 0.8610 & 0.8711 & 0.8479 \\ \addlinespace
-    		  50  & 0.8593 & 0.8547 & 0.8636 & 0.8852 & 0.8784 \\ \addlinespace
-    		  60  & 0.8666 & 0.8737 & 0.8805 & 0.8827 & 0.8895 \\ \addlinespace
-    		  70  & 0.8601 & 0.8664 & 0.8880 & 0.8827 & 0.8878 \\ \addlinespace
-    		  80  & 0.8241 & 0.8869 & 0.8867 & 0.8897 & 0.8784 \\ \addlinespace
-    		  90  & 0.8476 & 0.8667 & 0.8812 & 0.8928 & 0.8871 \\ \addlinespace
-    		  100  & 0.7911 & 0.8700 &0.8873 & 0.8873 & 0.8805 \\    
-            \bottomrule
-        \end{tabular}
-        \label{tab:zurich}
-    \end{table}
+A more detailed breakdown of the methods performance is shown in tables \ref{tab:pixel_wise_10_stuttgart} and \ref{tab:object_wise_10_stuttgart}. Table \ref{tab:pixel_wise_10_stuttgart} shows the pixel-wise precision and recall on the Stuttgart dataset after selecting the first 10 samples. Both methods, Gradient Norm and Gradient Projection have a high recall and precision of the crop class without degrading those of the weed class. The object-wise performance in Table \ref{tab:object_wise_10_stuttgart} further illustrates the effectiveness of these methods. Gradient Norm and Gradient Projection produce high precision and recall for both classes. The Uncertainty-based method, on the other hand, shows a large imbalance of performance on the two classes.
+   
+   
+%   
+%          \begin{figure}
+%%    \vspace{1em} 
+%    \centering
+%    \includegraphics[scale=0.3]{pics/tsne_grad_projection.pdf}
+%   		\caption{t-SNE of the images gradients on the Stuttgart dataset. The first 10 samples selected by the gradient projection method are shown in red.}
+%		\label{fig:tsne_proj}    		
+%     \vspace{-1em}
+%   \end{figure}
+%
+%
 
 
 
 
 
 
-
-
-\addtolength{\textheight}{-0.4cm}   % This command serves to balance the column lengths
+%\addtolength{\textheight}{-0.4cm}   % This command serves to balance the column lengths
 %                                   % on the last page of the document manually. It shortens
 %                                   % the textheight of the last page by a suitable amount.
 %                                   % This command does not take effect until the next page
@@ -594,7 +576,7 @@ A more detailed breakdown of the methods performance is shown in tables \ref{tab
 In this paper, we proposed an active learning approach that supports semantic
 segmentation in new environments by effectively selecting samples for user
 annotation with the goal of minimizing the annotation effort. We applied our
-approach in the domain for crop/weed classification for agricultural robots,
+approach in the domain of crop/weed classification for agricultural robots,
 reducing the annotation efforts when moving to different fields or environmental
 conditions.
 
@@ -607,11 +589,11 @@ approach on two agricultural  datasets for weed detection. The datasets
 reveal different characteristics from the dataset on which the network was pretrained.
 Our results show the effectiveness of our method as it produces higher semantic segmentation
 accuracies with a smaller number of training samples, compared to random sampling as
-well as uncertainty-based approaches for selecting samples for annotation. As as result
+well as uncertainty-based approaches for selecting samples for annotation. As a result
 of that, the effort in human annotation is considerably reduced without compromising
 performance.
  
-
+     %    \vspace{1em}
 %%\bibliographystyle{IEEEtran}
 \bibliographystyle{plain}
 
