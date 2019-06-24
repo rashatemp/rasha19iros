@@ -167,7 +167,7 @@ random sampling for annotation as well as uncertainty-based approaches.
     \begin{figure*}
     \centering
     \includegraphics[scale=0.9]{pics/output_system_overview.pdf}
-   		\caption{Overview figure of our system. We first perform very weakly supervised segmentation to obtain pseudo ground truth. Given the labels and different measures produced by the network, we rank the unlabeled samples and pick them accordingly for annotation. These are then used to refine the network.}
+   		\caption{Overview figure of our system. We first perform very weakly supervised segmentation to obtain pseudo ground truth. Given the labels and different measures produced by the network, we rank the unlabeled samples and pick them accordingly for annotation. These are then used to refine the entire network.}
 		\label{fig:overview}    		
    \end{figure*}
    
@@ -207,7 +207,8 @@ The Expected Model Output Change Principle (EMOC) developed by Freytag~\etal~\ci
 
 In the context of self-learning, Zhang~\etal~\cite{zhang2018self} use labels obtained with K-means graph cuts as ground truth for their network. The predictions produced by the model are then used as the target labels for the next iteration of the process.  
 
-Different to these works, we experiment with approaches that directly measure how annotated samples can affect the gradients. We use labels obtained with very weak supervision as pseudo ground truth and compute the gradients w.r.t the weights. We then refine a pre-trained network with the newly annotated samples in an iterative manner. 
+
+Different to these works, we experiment with approaches that directly measure how annotated samples can affect the gradients. We use labels obtained with very weak supervision as pseudo ground truth and compute the gradients w.r.t the weights. We then refine a pre-trained network with the newly annotated samples in an iterative manner. Our intuition is driven by the observation that the greater the mismatch is between the predicted segmentation and the ground truth, the larger the change is to the weights. This is in contrast to most of the approaches mentioned earlier that rely on the confidence of the network which may not be the best indication of the best samples to choose for annotation, as the network output might actually be correct although the network is uncertain about it.
 
 
 \section{Segmentation Framework} \label{sec:seg_framework}
@@ -270,7 +271,7 @@ Pseudo ground truth is generated for all unlabeled images by assigning pixels to
 
 \subsection{Norm of Gradients} \label{sec:grad_norm}
 
-For this approach and the following one, we pick those samples for annotation that might have the largest impact on the network weights. The norm of the network gradients is a measure that is indicative of which samples will affect the weights more than others. As in the previous approach, we use labels from very weakly supervised segmentation as pseudo ground truth. We run the network on the training images for one epoch and compute the gradients. Again we note that this step is only used to compute the gradients but we don't change the network weights. Once we have the gradients, we compute the $L_2$ norm of those in the last two layers of the network (the classifier layer and the one immediately before it).
+For this approach and the following one, we pick those samples for annotation that might have the largest impact on the network weights. The norm of the network gradients is a measure that is indicative of which samples will affect the weights more than others. As in the previous approach, we use labels from very weakly supervised segmentation as pseudo ground truth. We run the network on the training images for one epoch (to maintain computational efficiency) and compute the gradients. Again we note that this step is only used to compute the gradients but we don't change the network weights. Once we have the gradients, we compute the $L_2$ norm of those in the last two layers of the network (the classifier layer and the one immediately before it).
 \begin{align}
 n_g(\bold{x}) &=  \left\lVert \nabla_{w_f} \mathcal{L}(\bold{x}) \right\rVert,
 \end{align}  
@@ -379,7 +380,7 @@ The datasets we used were acquired with a Bosch Deepfield Robotics BoniRob UGV i
    		\caption{segmentation mask}
 		\label{unsup_lbl}    		
    \end{subfigure}
-    \caption{Foreground segmentation of vegetation. Note that only a rough segmentation is enough for our approach.}
+    \caption{Foreground segmentation of vegetation provided by clustering. Note that only a rough segmentation is enough for our approach.}
     \label{fig:unsupervised_foreground}
 \end{figure}
 
