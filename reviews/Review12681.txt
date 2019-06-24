@@ -1,0 +1,135 @@
+Reviewer 1 of IROS 2019 submission 1089
+
+Comments to the author
+======================
+
+Gradient-based Active Learning for Semantic Segmentation of
+Crop and Weed for Agricultural Robots
+
+This paper concerns a method to aid transfer learning for
+semantic segmentation for a not-specified agricultural
+perception task.  The motivation for the work is that the
+conditions between different data acquisition contexts can
+be different to the extent that using CNNs trained on one
+dataset cannot be used to semantically segment another
+dataset without fine tuning.  The question then becomes how
+to optimally choose which images in a new dataset to
+manually annotate.  The paper proposes a few active
+learning approaches to choose additional images: random
+selection (as a baseline), `uncertainty', `loss', `norm of
+gradients', and `gradient projection'.	Results are
+presented in terms of Intersection over Union. 
+
+I had a difficult time determining what exactly the
+contribution of this paper was, and/or the subject of the
+paper was.  Its title puts it in the agricultural domain,
+but there is little to mention of the agricultural context.
+ The `crop' is not specified, other than the dataset.  I
+have seen some of the work from this group, so I guessed it
+was sugar beet, and I have some idea of how sugar beet
+grows.	An agricultural robotics paper should place the
+work within the agricultural context [in my view] -- on
+page 3, the reader is told that transfer learning will
+simply not work.  Why not? The reader is not told why from
+an agricultural point-of-view, and there are no examples
+given either in terms of figures. Throughout, the
+agricultural context is treated as a sort of black box, and
+not explained or articulated.
+
+The paper doesn't seem to fit in the category of a pure
+machine learning paper either, or of improving annotation
+speed.	There are claims that the quality of the semantic
+segmentations are improved with less time, but there are no
+times given of how long it takes a human annotator to mark
+the images with their system, while waiting for the network
+refinement amoung the different methods.  Does the system
+provide the weakly annotated image as a starting point to
+save the user time, for example?  Some examples of those
+types of papers, where CNNs are used to improve annotations
+are: 
+
+[1]M. Tang, A. Djelouah, F. Perazzi, Y. Boykov, and C.
+Schroers, “Normalized Cut Loss for Weakly-Supervised CNN
+Segmentation,” 2018 IEEE Computer Society Conference on
+Computer Vision and Pattern Recognition (CVPR’18), vol.
+2018 IEEE Computer Society Conference on Computer Vision
+and Pattern Recognition (CVPR'18), p. 10, 2018.
+
+[2]Y. Wei, H. Xiao, H. Shi, Z. Jie, J. Feng, and T. S.
+Huang, “Revisiting Dilated Convolution: A Simple Approach
+for Weakly- and Semi- Supervised Semantic Segmentation,” in
+2018 IEEE Computer Society Conference on Computer Vision
+and Pattern Recognition (CVPR’18), 2018.
+
+[3]S. H. Kwak, S. Hong, and B. Han, “Weakly supervised
+semantic segmentation using superpixel pooling network,” in
+31st AAAI Conference on Artificial Intelligence, AAAI 2017,
+2017.
+
+[4]D. Acuna, H. Ling, A. Kar, and S. Fidler, “Efficient
+Interactive Annotation of Segmentation Datasets with
+Polygon-RNN++,” arXiv:1803.09693 [cs], Mar. 2018.
+
+Given these ambiguities about the contribution, and some
+editing issues below, it is difficult to say how much of an
+advance this paper provides over the state-of-the-art.
+
+Editorial issues:
+
+1. Figure 1 is never referenced in the text; getting this
+overview as a reader, sooner, would have been helpful.	
+
+2. B. Experiment setup. missing brand name for the GPUs --
+Nvidia.
+
+3. Figure 6. What do the blue circles represent?
+
+4. Page 3, III. Segmentation Framework.  Bonnet is
+described as running at 20 Hz.	This is not descriptive as
+written.  20Hz to train, run, on what type of hardware?
+
+5. I consider `ground truth' to mean the true labeling.  I
+found use of `pseudo ground truth' -- the predicted
+labels/weakly supervised labeling by the network -- to be
+very confusing.  
+
+6. Effective Sample Selection IV, page 3, gives an overview
+of the approaches.  Norm of gradients and Gradient
+Projection are either not listed, or listed incorrectly.
+
+7. IV. A. Uncertainty, page 3.	Notation is used without
+definition.  What is bold-x?  What is N?  
+
+8. "We then sort the images based on the computed
+uncertainty
+measure and pick the images accordingly to refine the
+network
+on a new dataset.The images are selected on a log-space
+scale, rather than selecting those with the highest
+uncertainty,
+as we found out that the network learns better when
+presented
+with diverse samples."	
+
+I read this many times and was still uncertain about how
+the algorithm works.  Were the uncertainty measures
+converted to a log scale first, and then sorted?  Do you
+choose higher, or lower values?  How many?  More
+specificity is needed.	
+
+9. IV. C. page 3.  Again, what is bold-x?  Guessing it is
+an image, but this needs to be defined.
+
+10.  There is a lot of use of `sorted' -- I feel that more
+specificity is needed (i.e. in which order), how many
+samples are selected, etc.?
+
+Suggestion only:
+
+1.  In future work, I suggest that you consider a different
+color scheme than red/black/green. Red-green color
+blindness is common and it would be impossible for someone
+with it to tell what your labeling of crop versus weed
+means.	Information:
+https://www.tableau.com/about/blog/2016/4/examining-data-vi
+z-rules-dont-use-red-green-together-53463

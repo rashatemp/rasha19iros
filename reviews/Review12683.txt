@@ -1,0 +1,32 @@
+Reviewer 2 of IROS 2019 submission 1089
+
+Comments to the author
+======================
+
+This paper proposed a criterion for unlabeled image
+selection based on gradients. The experimental results show
+the effectiveness of this idea. Generally, this paper is
+well written and easy to understand. However, the
+contribution is kind of limited. 
+
+In section iii-b the author mentioned “Pseudo ground truth
+is generated for all unlabeled images by assigning pixels
+to the selected clusters, and the loss is computed with
+respect to it.”  Does the Pseudo ground truth is provided
+by human labors? How does the clusters are selected?
+
+To calculate the norm of gradients, only one epoch is run
+for each image. However, the gradient is affected by from
+where it starts. If it is in the saddle point area, it
+could be small. The author should justify the reason of
+using a single epoch.
+
+The proportion for training-validation-testing is weird,
+why not 6-2-2?
+
+In fig.1, doe the refinement only happens to the decoder or
+the entire network?
+
+Does this idea work for other popular dataset like VOC and
+COCO? It could be more persuasive if comparison with state
+of art can be provided.

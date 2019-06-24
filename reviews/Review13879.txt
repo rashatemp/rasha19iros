@@ -1,0 +1,53 @@
+Reviewer 5 of IROS 2019 submission 1089
+
+Comments to the author
+======================
+
+Major Comments :-
+
+The proposed approach relies highly on how good are the
+gradients generated weakly supervised segmentation loss,
+yet there is no baseline on what happens if the authors
+train with a large number of images using this loss alone
+and then finetune with a small set of randomly selected
+human annotated images.
+ 
+The authors in background work section describe a number of
+already available approaches to solve the same problem, yet
+there is neither any experimental comparison nor an
+intuitive argument as to why the proposed approach is
+better than these methods.     
+
+Incase of Gradient Projection approach, the norm would be
+high is case of both really dissimilar or similar gradient
+directions, whereas the authors would intuitively only want
+the former case. It would be good to see some
+clarifications regarding this.
+ 
+There also seems like there a clear correlation between
+Gradient Projection approach and cosine similarity of
+gradients from auxiliary tasks approach proposed by Du et.
+al. [1]. It would be good to see some discussion on this. 
+
+In the results section authors write :-
+“The plots illustrate that both approaches achieve
+diversity despite the fact that the strongest gradients
+cluster together, near the bottom left”.
+
+This is a broad conclusion which is not obvious to me
+looking at the Figure 6 alone. Please plot the data points
+selected by “Uncertainty” and “random”	method too, in
+order to make a stronger case for this argument.  
+
+Minor Comments :-
+
+ Please write a more descriptive caption for figure 3. Is
+Fig 3(c) segmentation mask generated from the proposed
+approach or weakly supervised approach ? 
+
+There is no Figure that shows raw image, human annotation,
+weakly supervised segmentation mask and segmentation mask
+from the proposed. 
+
+In both figures 4 and 5 we don’t see a baseline datapoint
+of when there is 0 samples used for fine tuning.
