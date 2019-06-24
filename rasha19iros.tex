@@ -164,10 +164,18 @@ higher accuracy on the datasets with a fewer  number of samples compared to
 random sampling for annotation as well as uncertainty-based approaches.
 
 
+    \begin{figure*}
+    \centering
+    \includegraphics[scale=0.9]{pics/output_system_overview.pdf}
+   		\caption{Overview figure of our system. We first perform very weakly supervised segmentation to obtain pseudo ground truth. Given the labels and different measures produced by the network, we rank the unlabeled samples and pick them accordingly for annotation. These are then used to refine the network.}
+		\label{fig:overview}    		
+   \end{figure*}
+   
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{RELATED WORK}
 \label{sec:related}
+
 
 Several works focusing on the elimination or reduction of herbicide use,
 through the incorporation of autonomous ground robots in crop fields, have
@@ -202,25 +210,13 @@ In the context of self-learning, Zhang~\etal~\cite{zhang2018self} use labels obt
 Different to these works, we experiment with approaches that directly measure how annotated samples can affect the gradients. We use labels obtained with very weak supervision as pseudo ground truth and compute the gradients w.r.t the weights. We then refine a pre-trained network with the newly annotated samples in an iterative manner. 
 
 
-
-
 \section{Segmentation Framework} \label{sec:seg_framework}
 
 
-    \begin{figure*}
-      \vspace{1em}
-    \centering
-    \includegraphics[scale=0.9]{pics/output_system_overview.pdf}
-   		\caption{Overview figure of our system. We first perform very weakly supervised segmentation to obtain pseudo ground truth. Given the labels and different measures produced by the network, we rank the unlabeled samples and pick them accordingly for annotation. These are then used to refine the network.}
-		\label{fig:overview}    		
-%    \vspace{1em}
-   \end{figure*}
+Figure \ref{fig:overview} shows an overview of our framework. We use Bonnet~\cite{milioto2018bonnet} to train a model on the Bonn sugar beet dataset~\cite{chebrolu2017agricultural}. We then refine the trained model on other datasets by incrementally selecting batches of samples. The datasets differ in their crop/weed statistics and the images acquired with the cameras also differ in their illumination. Therefore, simply running the trained model to segment the vegetation in other fields does not work. We briefly first describe the architecture of the network used, then present different methods to select samples for refinement that we experimented with.
 
 
-We use Bonnet~\cite{milioto2018bonnet} to train a model on the Bonn sugar beet dataset~\cite{chebrolu2017agricultural}. We then refine the trained model on other datasets by incrementally selecting batches of samples. The datasets differ in their crop/weed statistics and the images acquired with the cameras also differ in their illumination. Therefore, simply running the trained model to segment the vegetation in other fields does not work. We briefly first describe the architecture of the network used, then present different methods to select samples for refinement that we experimented with.
-
-
-Bonnet is an open-source deep network framework developed by \cite{milioto2018bonnet}. It was designed with efficiency in mind so that it is able to run at 20 Hz. The network is based on SegNet \cite{badrinarayanan2017segnet} and ENet \cite{paszke2016enet}. It has an encoder-decoder structure with a total of 25 [5x5] convolutional layers. It uses batch normalization, residual connections, ReLU as the non-linearity layer, and the focal loss function \cite{DBLP:conf/iccv/LinGGHD17}.
+Bonnet is an open-source deep network framework developed by \cite{milioto2018bonnet} that was designed with efficiency in mind. The network is based on SegNet \cite{badrinarayanan2017segnet} and ENet \cite{paszke2016enet}. It has an encoder-decoder structure with a total of 25 [5x5] convolutional layers. It uses batch normalization, residual connections, ReLU as the non-linearity layer, and the focal loss function \cite{DBLP:conf/iccv/LinGGHD17}.
 
 To speed up prediction, the authors replace the [5x5] conventional convolutional layer with a mix of [1x1] convolutions and separable [1x5] and [5x1] convolutions. Additionally, instead of using the relatively more expensive transposed convolutions in the decoder, unpooling is done using the respective pooling indices in the encoder part.
 
@@ -246,7 +242,7 @@ As input to our network we only use the RGB channels.
 
 \section{Effective Sample Selection}\label{sec:approach}
 
-We experimented with different approaches to select samples. The baseline is randomly selecting samples for annotation in batches of 10. The other approaches include selecting samples driven by the uncertainty of the network, the training loss, and the weight gradients of the network.   
+We experimented with different approaches to select samples. The baseline is randomly selecting samples for annotation in batches of 10. The other approaches include selecting samples driven by the uncertainty of the network, the training loss, the norm of the network gradients, and the norm of projected out gradients.   
 
 
 \subsection{Uncertainty}
@@ -256,17 +252,20 @@ To infer the pixel-wise semantic segmentation of a new image, the network comput
 u(\bold{x}) &= \frac{1}{N} \sum_{i=1}^N \max_c p(c|x_i),
 \end{align}  
 
-where $x_i$ is pixel $i$ in the image and $c$ is the predicted class.
+where $x_i$ is pixel $i$ in image $\bold{x}$, $c$ is the predicted class and $N$ is the number of pixels in the image.
 
-We then sort the images based on the computed uncertainty measure and pick the images accordingly to refine the network on a new dataset. The images are selected on a log-space scale, rather than selecting those with the highest uncertainty, as we found out that the network learns better when presented with diverse samples. The log-space approach is used in the following methods as well.
+We then sort the images based on the computed uncertainty measure in a descending order and pick the images accordingly to refine the network on a new dataset. The images are selected on a log-space scale, rather than selecting those with the highest uncertainty, as we found out that the network learns better when presented with diverse samples.
 
+We generate a string of numbers, starting from zero, that are spaced evenly on a log scale. These numbers are then used as the indices of the samples to be selected. Since the samples are sorted, this approach would more heavily select samples that have higher uncertainty values while not completely discarding those that the network is more confident of their predictions. 
+
+The log-space approach is used in the following methods as well.
 \subsection{Loss} \label{sec:loss}
 
 The loss of the network is an indication of the segmentation error. Given that training neural networks with backpropagation is driven by the loss, it also provides a useful cue as to which samples the network will most benefit from. We compute the focal loss \cite{DBLP:conf/iccv/LinGGHD17} based on a pseudo-ground truth, consisting of a foreground-background segmentation that we achieve using k-means clustering on the RGB channels.
 
 Initially, we use k-means to determine 20 cluster representatives from 10 randomly selected images. After viewing a single image that contains all 20 clusters, a human annotator chooses which clusters represent vegetation. In our experiments, it was enough to select two clusters. In accordance with previously used terminology \cite{zhang2018self}, we refer to this step as being very weakly supervised, since it only involves inspecting a single image. 
 
-Pseudo ground truth is generated for all unlabeled images by assigning pixels to the selected clusters, and the loss is computed with respect to it. The images are sorted based on this loss and again chosen on a log-space scale. We note that the pseudo ground truth is only used to compute the loss but the network weights remain unchanged. They are only later updated with the manual annotations of the selected samples.
+Pseudo ground truth is generated for all unlabeled images by assigning pixels to the selected clusters, and the loss is computed with respect to it. The images are sorted based on this loss in a descending order and again chosen on a log-space scale. We note that the pseudo ground truth is only used to compute the loss but the network weights remain unchanged. They are only later updated with the manual annotations of the selected samples.
 
 
 \subsection{Norm of Gradients} \label{sec:grad_norm}
@@ -275,9 +274,9 @@ For this approach and the following one, we pick those samples for annotation th
 \begin{align}
 n_g(\bold{x}) &=  \left\lVert \nabla_{w_f} \mathcal{L}(\bold{x}) \right\rVert,
 \end{align}  
-where $w$ are the weights of the final two layers.
+where $\bold{x}$ is the image and $w$ are the weights of the final two layers.
 
-The images are sorted based on this measure and we pick samples on a log-space scale afterwards.
+The images are sorted based on this measure in a descending order and we pick samples on a log-space scale afterwards.
 
 \subsection{Gradient Projection} \label{sec:grad_proj}
 
@@ -285,7 +284,7 @@ The log-space in the previous approaches was used to ensure there is enough dive
 \begin{align}
 n_p(\bold{x}) &=  \left\lVert \bold{g_x} - \sum_{i=1}^S \frac{\left\langle \bold{g_i}, \bold{g_x} \right\rangle}{\left\langle \bold{g_i}, \bold{g_i} \right\rangle} \bold{g_i} \right\rVert,
 \end{align}
-where $\bold{g_i}$ is the gradient of the $i$th out of $S$ previously selected samples, and $\bold{g_x}$ is the gradient of the current sample.
+where $\bold{x}$ is the image, $\bold{g_i}$ is the gradient of the $i$th out of $S$ previously selected samples, and $\bold{g_x}$ is the gradient of the current sample.
 
 We select samples one by one, each time sorting them according to this measure and choosing the one with the highest norm of the residual. To pick the first sample, we choose that with the highest norm of the gradient.
 
@@ -391,7 +390,7 @@ We evaluate our different approaches by first training a network on the Bonn dat
 
 For the methods presented in sections \ref{sec:loss}, \ref{sec:grad_norm}, and \ref{sec:grad_proj}, we first obtain foreground masks with very weak supervision. Figure  \ref{fig:unsupervised_foreground} shows an image, its ground truth and the foreground segmentation provided by clustering. It is an important finding from our experiments that a rough segmentation is sufficient for the purpose of selecting images for annotation. This makes our proposed gradient-based approach feasible in practice.
 
-We follow the approach of \cite{milioto2018real} and split the new dataset into three sets: 40\% for training, 10\% for validation, and 50\% for testing. The samples are picked from the training set. All experiments were conducted on four Titan X GPUs.  
+We follow the approach of \cite{milioto2018real} and split the new dataset into three sets: 40\% for training, 10\% for validation, and 50\% for testing. The samples are picked from the training set. All experiments were conducted on four Nvidia Titan X GPUs.  
 
 \subsection{Results}
 
@@ -534,7 +533,7 @@ We combined the idea of gradient-based selection with two alternative approaches
    %  \vspace{-2em} 
     \centering
     \includegraphics[width=\linewidth]{pics/tsne_grad_norm.pdf}
-   		\caption{t-SNE of the images gradients on the Stuttgart dataset. The first 10 samples selected by the gradient norm method are shown in yellow while the ones selected by the gradient projection are shown in red.}
+   		\caption{t-SNE of the images gradients on the Stuttgart dataset. Each point represents the 2-D embedding of the gradient vector. The first 10 samples selected by the gradient norm method are shown in yellow while the ones selected by the gradient projection are shown in red.}
 		\label{fig:tsne}    		
   %   \vspace{-1em}
    \end{figure}
