@@ -207,9 +207,11 @@ The Expected Model Output Change Principle (EMOC) developed by Freytag~\etal~\ci
 
 In the context of self-learning, Zhang~\etal~\cite{zhang2018self} use labels obtained with K-means graph cuts as ground truth for their network. The predictions produced by the model are then used as the target labels for the next iteration of the process.  
 
+Du~\etal~\cite{du2018adapting} use gradient similarity to determine when an auxiliary task is helpful for transfer learning to the main task and when it can be hurtful. Although in our work, the weakly supervised setting can be seen as an auxiliary task, we only use the gradients computed there as a guidance to choose samples for annotations. These gradients are not used to measure similarity with those of the main task nor are the parameters of the main task updated with those gradients.  
+
+Several works have explored weakly supervised segmentation. By having convolution kernels with different dilation rates, Wei~\etal~\cite{wei2018revisiting} are able to improve object localization in weakly and semi supervised settings. Acuna~\etal~\cite{acuna2018efficient} use reinforcement learning to train an encoder and RNN decoder model that is able to predict polygon vertices of an object. Tang~\etal~\cite{tang2018normalized} combine partial cross entropy loss for labeled pixels with normalized cut loss. Kwak~\etal~\cite{kwak2017weakly} define a superpixel pooling layer that performs average pooling on upsampled feature maps using superpixels as the pooling layout.
 
 Different to these works, we experiment with approaches that directly measure how annotated samples can affect the gradients. We use labels obtained with very weak supervision as pseudo ground truth and compute the gradients w.r.t the weights. We then refine a pre-trained network with the newly annotated samples in an iterative manner. Our intuition is driven by the observation that the greater the mismatch is between the predicted segmentation and the ground truth, the larger the change is to the weights. This is in contrast to most of the approaches mentioned earlier that rely on the confidence of the network which may not be the best indication of the best samples to choose for annotation, as the network output might actually be correct although the network is uncertain about it.
-
 
 \section{Segmentation Framework} \label{sec:seg_framework}
 
