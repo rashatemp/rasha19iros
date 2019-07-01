@@ -1,79 +1,25 @@
-%DIFF 1 new
-\documentclass[letterpaper, 10 pt, conference]{ieeeconf}  % Comment this line out if you need a4paper
-\IEEEoverridecommandlockouts                              % This command is only needed if
-\overrideIEEEmargins                                      % Needed to meet printer requirements.
 
-\usepackage{graphics}    % for pdf, bitmapped graphics files
-\usepackage{times}       % assumes new font selection scheme installed
-\usepackage{amsmath}     % assumes amsmath package installed
-\usepackage{amssymb}     % assumes amsmath package installed
-\usepackage{graphicx}
-\usepackage{algorithm}
-\usepackage[noend]{algpseudocode}
-\usepackage[activate=alltext]{microtype}
-\usepackage{rotating}
+\usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{makecell}
+\usepackage{subcaption}
+\usepackage{booktabs}
 
 
-
-\usepackage{subcaption} % enables use multiple figures in a figure
-\usepackage{tabu}     % provides advanced tables
-\usepackage{booktabs} % enables reference bookstyle tables
-\usepackage{xcolor}
-\usepackage{import}
-\usepackage{url}
-
-% make captions look like original IEEE style
-% table:  ieeeconf.cls:2017 \begin{center}{\footnotesize #1}\\{\footnotesize\scshape #2}\end{center}% figure: ieeeconf.cls:
-% figure: ieeeconf.cls:2024 \setbox\@tempboxa\hbox{\footnotesize #1.~~ #2}%
-\DeclareCaptionFont{ieeetable}{\footnotesize\scshape}
-\DeclareCaptionLabelSeparator{ieeefigure}{.~~ }
-\DeclareCaptionLabelSeparator{ieeetable}{\\[0.5em]}
-\captionsetup[figure]{labelseparator=ieeefigure, font=footnotesize}
-\captionsetup[table]{justification=centering, labelseparator=ieeetable, textfont=ieeetable, labelfont=footnotesize}
-\captionsetup[subfigure]{font=footnotesize}
-\captionsetup{subrefformat=parens}
-
-%% Aligns the last page but causes errors on some machines (such as OSX), so don't use it for now.
-\usepackage{flushend}
-
-%% Style hacks to save space
-%\setlength{\textfloatsep}{1.95em}
-%\setlength{\dbltextfloatsep}{1.1em}
-%\usepackage[font=small]{caption}
-
-%% Key definitions for text elements. USE THEM
-\def\secref#1{Sec.~\ref{#1}}
-\def\figref#1{Fig.~\ref{#1}}
-\def\tabref#1{Tab.~\ref{#1}}
-\def\eqref#1{Eq.~(\ref{#1})}
-\def\algref#1{Alg.~\ref{#1}}
-
-%% Other useful macros
-\newcommand\todo[1]{\textbf{[TODO: #1}]}
 \newcommand\etal{\emph{et~al.}}
 
+\title{ Gradient-based Active Learning for Semantic Segmentation \\of Crop and Weed for Agricultural Robots}
 
-%% Some math definition
-\def\argmax{\mathop{\rm argmax}}
-\def\argmin{\mathop{\rm argmin}}
-\newcommand{\bigO}[1]{$\mathcal{O}(#1)$}
-
-%DIFF 2
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\title{\LARGE \bf Gradient-based Active Learning for Semantic Segmentation \\of Crop and Weed for Agricultural Robots}
-
-\author{Rasha Sheikh \and Philipp Lottes \and Andres Milioto \and Cyrill Stachniss \and Maren Bennewitz \and Thomas Schultz% <-this % stops a space
-  \thanks{All authors are with the University of
-    Bonn, Germany. This work has partly been supported by the German Research Foundation under Germany's Excellence Strategy, EXC-2070 - 390732324 (PhenoRob).}%
+\author[Rasha Sheikh \& al.]{\parbox{\textwidth}{\centering Rasha Sheikh\thanks{All authors are with the University of
+    Bonn, Germany. This work has been partly supported by the German Research Foundation under Germany's Excellence Strategy, EXC-2070 - 390732324 (PhenoRob).}, Philipp Lottes, Andres Milioto, Cyrill Stachniss, Maren Bennewitz, Thomas Schultz
 }
+}
+
 
 \begin{document}
 \maketitle
-\thispagestyle{empty} 
-\pagestyle{empty}
-
+%\thispagestyle{empty} 
+%\pagestyle{empty}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{abstract}
@@ -224,23 +170,6 @@ Bonnet is an open-source deep network framework developed by \cite{milioto2018bo
 To speed up prediction, the authors replace the [5x5] conventional convolutional layer with a mix of [1x1] convolutions and separable [1x5] and [5x1] convolutions. Additionally, instead of using the relatively more expensive transposed convolutions in the decoder, unpooling is done using the respective pooling indices in the encoder part.
 
 As input to our network we only use the RGB channels.
-
-
-%Network was designed with efficiency in mind.
-%has an encoder decoder structure
-%runs at 20 Hz
-%
-%As input we only used the RGB images
-%
-%used batch normalization, ReLU as non linearity
-%
-%residual connections
-%
-%mix of 1x1 convolutions and separable convolutions to increase the speed
-%
-%unpooling in the decoder is done using the respective pooling indices in the encoder part. instead of using the relatively more expensive transposed convolutions
-%
-%25 convolutional layers.
 
 
 \section{Effective Sample Selection}\label{sec:approach}
@@ -543,22 +472,6 @@ We combined the idea of gradient-based selection with two alternative approaches
     
 A more detailed breakdown of the methods performance is shown in tables \ref{tab:pixel_wise_10_stuttgart} and \ref{tab:object_wise_10_stuttgart}. Table \ref{tab:pixel_wise_10_stuttgart} shows the pixel-wise precision and recall on the Stuttgart dataset after selecting the first 10 samples. Both methods, Gradient Norm and Gradient Projection have a high recall and precision of the crop class without degrading those of the weed class. The object-wise performance in Table \ref{tab:object_wise_10_stuttgart} further illustrates the effectiveness of these methods. Gradient Norm and Gradient Projection produce high precision and recall for both classes. The Uncertainty-based method, on the other hand, shows a large imbalance of performance on the two classes.
    
-   
-%   
-%          \begin{figure}
-%%    \vspace{1em} 
-%    \centering
-%    \includegraphics[scale=0.3]{pics/tsne_grad_projection.pdf}
-%   		\caption{t-SNE of the images gradients on the Stuttgart dataset. The first 10 samples selected by the gradient projection method are shown in red.}
-%		\label{fig:tsne_proj}    		
-%     \vspace{-1em}
-%   \end{figure}
-%
-%
-
-
-
-
 
 
 %\addtolength{\textheight}{-0.4cm}   % This command serves to balance the column lengths
@@ -596,54 +509,9 @@ of that, the effort in human annotation is considerably reduced without compromi
 performance.
  
      %    \vspace{1em}
-%%\bibliographystyle{IEEEtran}
-\bibliographystyle{plain}
-
-\bibliography{bibliography}
+\bibliographystyle{eg-alpha-doi} 
+\bibliography{bibliography} 
 
 \end{document}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% NOTES ON PAPER WRITING
-%
-% Rename the paper.tex file into your paper name. Use the BibTeX key policy (see below)
-%
-% Use a Spell Checker with US English as spelling language
-% 
-% Use Academic Writing Check: https://github.com/devd/Academic-Writing-Check
-%
-% Use GIT for version control. Use our gitlab sever!
-%
-% Make sure your Makefile is working correctly and compiles the documents 
-%
-% All images go to the subfolder pics and reviews into the reviews folder
-%
-% Make sure the source files for images are in the pics folder as well (unless they are huge)
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% NOTES ON BIB ENTRIES
-%
-% Bibtex Key Policy
-%
-%    All in lower case
-%    Use the key structure: <lastnamefirstauthor><2 digit year><conference/journal><extra>
-%    Use <extra>:
-%        only to disambiguate: - first chars of the first 4 words f the title
-%    Examples: stachniss08icra, stachniss08icraws, stachniss08icra-adhc
-%    Use the BibTeX key also at the filename for the paper, e.g., stachniss08icra.pdf
-%
-% Bibtex Entries
-%
-%    Use strings for conferences and journal name in order to keep obtain consistent entries
-%    Use the identical abbreviations for conference name, e.g., “Proc. of the IEEE Int. Conf. on Robotics and Automation (ICRA)”
-%    Avoid adding the location in addition to the city or street of the conference.
-%    Use doi for the official document on the publisher webpage. 
-%    Abbreviate the first name of the authors, e.g., C. Stachniss instead of Cyrill Stachniss
-%    In case of a first name and a middle name, use no space between them, e.g., C.J. Stachniss
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-%DIFF end
