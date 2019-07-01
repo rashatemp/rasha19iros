@@ -10,7 +10,7 @@
 
 \title{ Gradient-based Active Learning for Semantic Segmentation \\of Crop and Weed for Agricultural Robots}
 
-\author[Rasha Sheikh \& al.]{\parbox{\textwidth}{\centering Rasha Sheikh\thanks{All authors are with the University of
+\author[Rasha Sheikh et al.]{\parbox{\textwidth}{\centering Rasha Sheikh\thanks{All authors are with the University of
     Bonn, Germany. This work has been partly supported by the German Research Foundation under Germany's Excellence Strategy, EXC-2070 - 390732324 (PhenoRob).}, Philipp Lottes, Andres Milioto, Cyrill Stachniss, Maren Bennewitz, Thomas Schultz
 }
 }
@@ -330,7 +330,7 @@ We follow the approach of \cite{milioto2018real} and split the new dataset into 
     \begin{figure}
     \centering
  %   \vspace{-1em}
-    \includegraphics[width=\linewidth]{pics/pw_iou_stuttgart.pdf}
+    \includegraphics[width=\linewidth]{pics/pw_iou_stuttgart_rev.pdf}
    		\caption{Pixel-wise mean IoU on the Stuttgart dataset.}
 		\label{fig:iou_stuttgart}    		
 %    \vspace{1em}
@@ -339,7 +339,7 @@ We follow the approach of \cite{milioto2018real} and split the new dataset into 
     \begin{figure}
     \centering
  %   \vspace{-1em}
-    \includegraphics[width=\linewidth]{pics/pw_iou_zurich.pdf}
+    \includegraphics[width=\linewidth]{pics/pw_iou_zurich_rev.pdf}
    		\caption{Pixel-wise mean IoU on the Zurich dataset.}
 		\label{fig:iou_zurich}    		
  %   \vspace{1em}
@@ -347,6 +347,8 @@ We follow the approach of \cite{milioto2018real} and split the new dataset into 
    
 
 Figures \ref{fig:iou_stuttgart} and \ref{fig:iou_zurich} show the pixel-wise mean intersection over union (mIoU) on the Stuttgart and Zurich datasets when selecting samples for annotation with different methods. It can be seen from the plots that methods that take into account the impact of the samples on the weights lead to better generalization to the rest of the unseen data, even when presented with a small number of annotated images. In particular, ranking the samples based on the norm of the gradients results in higher mIoU on both datasets.
+
+The figures also show the performance of two baselines: "random" and "unsupervised". They both refer to random sampling of images to annotate. However with the unsupervised approach, the model is first trained with the foreground/background masks that were generated using clustering. 
 
 To further quantify the performance of our approach, we use the object-wise metric defined by \cite{milioto2018real}, where the accuracy is measured for objects larger than 50 pixels. Since the target application is weeding with agricultural robotics, this metric is more directly useful than pixel-wise performance.  
 
