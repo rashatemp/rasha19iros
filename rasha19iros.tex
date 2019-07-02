@@ -8,10 +8,11 @@
 
 \newcommand\etal{\emph{et~al.}}
 
-\title{ Gradient-based Active Learning for Semantic Segmentation \\of Crop and Weed for Agricultural Robots}
+\title{Gradient-based Sample Selection for Transfer Learning of\\ Semantic Segmentation: Application in Agricultural Robotics}
 
-\author[Rasha Sheikh et al.]{\parbox{\textwidth}{\centering Rasha Sheikh\thanks{All authors are with the University of
-    Bonn, Germany. This work has been partly supported by the German Research Foundation under Germany's Excellence Strategy, EXC-2070 - 390732324 (PhenoRob).}, Philipp Lottes, Andres Milioto, Cyrill Stachniss, Maren Bennewitz, Thomas Schultz
+\author[Rasha Sheikh et al.]{\parbox{\textwidth}{\centering Rasha Sheikh\thanks{This work has been partly supported by the German Research Foundation under Germany's Excellence Strategy, EXC-2070 - 390732324 (PhenoRob).}, Philipp Lottes, Andres Milioto, Cyrill Stachniss, Maren Bennewitz, Thomas Schultz}
+\\
+{\parbox{\textwidth}{\centering  University of Bonn, Germany}
 }
 }
 
@@ -44,79 +45,50 @@ approach reduces the required human labeling  effort.
 \end{abstract} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{INTRODUCTION}
+\section{Introduction}
 \label{sec:intro}
-
-The ability to  interpret the scene in front of a robot is key for
-intelligent behavior in several applications. For example, precision farming
-robots need to know which type of plant they perceive or autonomous cars need to
-know  which object in their surroundings is a car, a pedestrian, or a
-cyclist. These  classification or semantic segmentation tasks are typically
-tackled using  convolutional neural networks~(CNNs) operating on  image data.
-In order to perform  well, neural networks need to be trained with
-appropriately annotated datasets.
-
-The performance of most supervised learning approaches and especially deep
-learning  systems is related to the quality and quantity of training data.
-Annotated training data, however, has a high cost as often a larger number of
-labeled training data is  required.  In this work, we focus on optimizing the
-training set generation for  semantic segmentation of image data obtained
-from a mobile robot. Semantic segmentation refers to the task of computing a
-pixel-wise  labeling of the images. More concretely, we address the
-agricultural robotics  application in which robots should perform automated
-weed control. For the semantic  segmentation, this means that we need to
-compute the semantic label ``crop'', ``weed'',  or ``misc'' for every pixel in
-the image. This task is particularly challenging  as the field conditions
-often change substantially between years, regions, weather, and  soil
-conditions. Thus, one often tries to adapt and refine existing semantic
-segmentation systems to new field conditions through annotated data from the
-new field. As these new annotation need to be executed at the end-users site,
-one is interested in keeping this effort as low as possible. Thus, this
-problem is a perfect domain for active  learning approaches trying to reduce
-the required amount of data to be annotated.
-
-Given annotated data on one agricultural field and a network that was trained
-on it, we address the problem of transferring this knowledge to new fields with
-minimum effort.  Datasets from different fields reveal different crop and weed
-statistics. They almost  always differ by soil type, weather condition, or
-various small objects that can be found  on the ground, such as stones, dried
-vegetation, or marks from agricultural machines,  i.e., patterns that are
-neither crop nor weed. Additionally, the robot can acquire  images of plants
-at a certain growth stage in one field, while the growth state on the  target
-field is different. Lastly, artifacts such as contrast changes can be found in
-the camera images captured from the various locations.  These conditions make
-it difficult to simply reuse a previously trained network from one  field and
-infer the labels on another~\cite{lottes2018ral,lottes2017iros}. Thus, 
-the network has to be
-re-trained on  annotated images taken in the new field. We propose an
-active learning  approach to select samples that the network will most benefit
-from and will generalize  to the rest of the unlabeled data while minimizing
-the effort of annotating images.
-
-The main contribution of this work is an active learning approach that
-intelligently picks images taken under the new conditions based on the effect
-these training samples will have on the weight gradients of the CNN. Our
-strategy is based  on the observation that given a trained model and unseen
-samples from  a different domain, the samples that the network performs most
-poorly on, especially at the  beginning, will have the largest weight
-gradients and consequently the largest impact on the  weights. This strategy might appear to be circular, since computing gradients already requires class labels at a stage where are still selecting images for labeling.  We circumvent this by using pseudo ground truth that we obtain with very weakly supervised segmentation. Our approach
-selects samples in batches, each time refining the network, then computing a
-new  ranking of the unlabeled data. The best samples are then selected and the
-network is re-trained. To compute the real gradients, corresponding ground
-truth data is needed. Thus, in our approach, we approximate the ground truth as the result of unsupervised segmentation to estimate the gradient.  We
-evaluated our framework on  agricultural datasets~\cite{chebrolu2017agricultural} 
-with different characteristics.  Our results indicate that our method produces a
-higher accuracy on the datasets with a fewer  number of samples compared to
-random sampling for annotation as well as uncertainty-based approaches.
-
 
     \begin{figure*}
     \centering
     \includegraphics[scale=0.9]{pics/output_system_overview.pdf}
-   		\caption{Overview figure of our system. We first perform very weakly supervised segmentation to obtain pseudo ground truth. Given the labels and different measures produced by the network, we rank the unlabeled samples and pick them accordingly for annotation. These are then used to refine the entire network.}
+   		\caption{Overview of our system. We first perform very weakly supervised segmentation to obtain pseudo ground truth. Given the labels and different measures produced by the network, we rank the unlabeled samples and pick them accordingly for annotation. These are then used to refine the entire network.}
 		\label{fig:overview}    		
    \end{figure*}
-   
+
+Image segmentation is a classical task in computer vision with many important applications, including the construction of autonomous systems, and medical image analysis. Over the last few years, deep convolutional neural networks~(CNNs) have firmly established themselves as the state-of-the-art approach to image segmentation. However, their accuracy crucially depends on the quality and quantity of the available training data.
+
+Having human experts annotate a large number of training images incurs a high cost. In many cases, it is now a limiting factor for achieving high-quality segmentations. Therefore, it has become popular to use transfer learning: Instead of training a neural network from a random initialization, an architecture that has been trained for a different task is re-used, and fine-tuned with a limited number of training samples for the new task. It has been observed that especially the features in early layers tend to be application independent, and that transfer learning has a beneficial effect even when it involves two distant tasks \cite{yosinski:2014}.
+
+Often, many more images are available for the target task than the human has time to annotate. In this scenario, it can be beneficial to rank the unlabeled images with respect to their expected benefit for fine-tuning the network. This is referred to as active learning, since the learning technique actively asks for labels on specific inputs. Most available active learning techniques focus on samples that the network is uncertain about. In this work, we propose an alternative strategy. It is based on two steps, which are illustrated in Figure~\ref{fig:overview}: In the first step, with minimal human intervention, a very weakly supervised segmentation of all unlabeled images is achieved. This leads to imperfect results, which will be used as a pseudo ground truth. In the second step, images are selected for annotation if the current network output deviates from their pseudo ground truth. In particular, we propose to use images for which the gradient of the loss with respect to the neural network weights has a large norm, since they are expected to have the largest impact during training. We combine this idea with two different strategies to achieve diversity in the chosen samples. The final refinement is done with the correct (i.e., manual) labels of the selected images.
+
+We evaluate our novel strategy on a specific task from agricultural robotics. In precision farming, robots take an image of a field and  need to compute the semantic labels ``crop'', ``weed'',  or ``misc'' for every pixel, in order to perform automated weed control. A challenge lies in the fact that visual appearance varies substantially between years, regions, weather, and soil conditions. Thus, one often tries to adapt and refine existing semantic segmentation systems to new field conditions through annotated data from the new field. This is a perfect domain for transfer learning and active sample selection.
+
+Our results indicate that, when only a small number of new training samples can be annotated, selecting them with our novel gradient-based approach results in a higher accuracy of the final refined CNN when compared to either a random or an uncertainty-based selection of training samples. We also demonstrate that the gradient-approach works better than making the selection simply based on the loss with respect to the same pseudo ground truth.
+
+% I think the following is slightly too much detail for the introduction; we might move it to a later part of the paper:
+
+% Given annotated data on one agricultural field and a network that was trained
+% on it, we address the problem of transferring this knowledge to new fields with
+% minimum effort.  Datasets from different fields reveal different crop and weed
+% statistics. They almost  always differ by soil type, weather condition, or
+% various small objects that can be found  on the ground, such as stones, dried
+% vegetation, or marks from agricultural machines,  i.e., patterns that are
+% neither crop nor weed. Additionally, the robot can acquire  images of plants
+% at a certain growth stage in one field, while the growth state on the  target
+% field is different. Lastly, artifacts such as contrast changes can be found in
+% the camera images captured from the various locations.  These conditions make
+% it difficult to simply reuse a previously trained network from one  field and
+% infer the labels on another~\cite{lottes2018ral,lottes2017iros}. Thus, 
+% the network has to be
+% re-trained on  annotated images taken in the new field.
+
+% Our approach selects samples in batches, each time refining the network, then computing a
+% new  ranking of the unlabeled data. The best samples are then selected and the
+% network is re-trained. To compute the real gradients, corresponding ground
+% truth data is needed. Thus, in our approach, we approximate the ground truth as the result of unsupervised segmentation to estimate the gradient.  We
+% evaluated our framework on  agricultural datasets~\cite{chebrolu2017agricultural} 
+% with different characteristics.  
+ 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{RELATED WORK}
@@ -517,3 +489,7 @@ performance.
 \end{document}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "rasha19vmv"
+%%% End:
