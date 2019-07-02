@@ -363,7 +363,10 @@ As the model is trained on more and more samples, the accuracy plateaus as is ex
 
 The gradient norm method shows a consistent improvement over other methods for different number of samples and across the two datasets, confirming that samples that might have a larger influence on the weights are more valuable for annotation, as the network can benefit more from them.
 
-We combined the idea of gradient-based selection with two alternative approaches to achieving diversity in the selected images: Picking on a log scale, or projecting out gradients that have been selected previously. In our experiments, both strategies performed well. To further analyze them, we plot the t-distributed Stochastic Neighbor Embedding (t-SNE) of the gradients in Figure~\ref{fig:tsne}. Each circle denotes the 2-D embedding of the gradient of a single image before picking the first 10 samples. Samples selected by the gradient norm are shown in yellow; ones selected by the gradient projection method are shown in red. The plots illustrate that both approaches achieve diversity despite the fact that the strongest gradients cluster together, near the bottom left. However, the fact that the gradient projection method selects many points at the boundary of the distribution suggests that it might be improved further by adding a mechanism to ensure that selected images are representative of a larger subset in the overall dataset. We plan to investigate this in our future work.
+We combined the idea of gradient-based selection with two alternative approaches to achieving diversity in the selected images: Picking on a log scale, or projecting out gradients that have been selected previously. In our experiments, both strategies performed well. To further analyze them, we plot the t-distributed Stochastic Neighbor Embedding (t-SNE) of the gradients in Figure~\ref{fig:tsne}. Each circle denotes the 2-D embedding of the gradient of a single image before picking the first 10 samples. Samples selected by each method are shown in different colors. We found that both gradient and loss based approaches favor samples that have gradients clustered at the bottom of the plot. In our future work we plan to investigate this further.
+
+%Samples selected by the gradient norm are shown in yellow; ones selected by the gradient projection method are shown in red. The plots illustrate that both approaches achieve diversity despite the fact that the strongest gradients cluster together, near the bottom left. However, the fact that the gradient projection method selects many points at the boundary of the distribution suggests that it might be improved further by adding a mechanism to ensure that selected images are representative of a larger subset in the overall dataset. We plan to investigate this in our future work.
+
 
     \begin{table}
            \vspace{1em}
@@ -466,8 +469,8 @@ We combined the idea of gradient-based selection with two alternative approaches
                    \begin{figure}
    %  \vspace{-2em} 
     \centering
-    \includegraphics[width=\linewidth]{pics/tsne_grad_norm.pdf}
-   		\caption{t-SNE of the images gradients on the Stuttgart dataset. Each point represents the 2-D embedding of the gradient vector. The first 10 samples selected by the gradient norm method are shown in yellow while the ones selected by the gradient projection are shown in red.}
+    \includegraphics[width=\linewidth]{pics/tsne_all.pdf}
+   		\caption{t-SNE of the images gradients on the Stuttgart dataset. Each point represents the 2-D embedding of the gradient vector. The first 10 samples selected by each method are shown in different colors.}
 		\label{fig:tsne}    		
   %   \vspace{-1em}
    \end{figure}
