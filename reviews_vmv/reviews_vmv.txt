@@ -1,0 +1,112 @@
+====================================================================
+Reviews
+==================================================================== 
+
+
+-------------------- Summary Review --------------------
+
+Thank you for submitting this paper, all reviewers agreed that the presented active learning idea is interesting. We had an active discussion, but most reviewers agreed that a few issues need to be addressed before the paper can be accepted: 
+
+1) Evaluation on an additional dataset is needed. 
+
+2) The current evaluation needs to show the advantage of the presented method over previous work more clearly, for example by increasing the resolution of the plots in the 1-20 sample region (where the method seems to have the largest advantage). 
+
+3) Discussion, and a quantitative comparison to methods based on the expected gradient length (EGL) are needed. Since these methods seem to overlap with some part of the claimed contributions, the position of the presented method with respect to EGL methods needs to be clarified. 
+
+Additionally, we recommend taking a look at the minor issues pointed out by the reviewers. 
+
+We encourage resubmitting this work once these issues have been solved. 
+
+
+
+-------------------- Review 1 --------------------
+
+Overall Recommendation: 6 (6 - acceptable)
+Evaluation Confidence: 3 (3 - Moderately confident, I know as much as most)
+
+Summary: The paper addresses the tedious problem of labeling images for training in deep neural networks. They propose an active learning method, where the network suggests the most important images to be labeled, thus reducing the overall effort for labeling. They apply their method for segmentation of agriculture images, by very roughly segmenting images using K-means clustering and labeling of only these clusters. Based on the gradients in the network computed when using these approximate labels for training, they decide which images contribute most to the learning process. ONly those images need to be labled correctly reducing the effort in labeling. In experiments on an agriculture dataset, they show performance gains  compared to the standard case of looking for the uncertainty of classifications results, especially for very low numbers of labled images. For larger number of labeled images, the proposed method does not provide advantages to the standrad approach.
+
+
+Clarity of Exposition: The paper is clearly written and easy to understand.
+
+
+Technical Soundness: The paper looks technically sound. Experiments are only conducted on one agriculture dataset. Some more experiments would have strengthened the overall conclusions and evaluation.
+
+
+Quality of References: References are fine
+
+
+Reproducibility: Could be reproduced with the description in the paper.
+
+
+Explanation of Recommendation: The proposed method in an interesting idea to determine which images to label and thus reducing the creation of a training dataset in DNN based segmentation. It is a nice contributions although gains are very limited for larger number of images labeled.
+Additional experiments would be beneficial. 
+It would be interesting if the authors could provide a sample framework on how to calulate all the gradients and how to select the images such that other researchers could experiment with this idea as well.
+
+
+-------------------- Review 2 --------------------
+
+Overall Recommendation: 6 (6 - acceptable)
+Evaluation Confidence: 3 (3 - Moderately confident, I know as much as most)
+
+Summary: The paper deals with the problem of transfer learning. In the paper a method is proposed that  for the weights of the network  the influence of the so far unlabeled samples on the weights of the network are taken into account. 
+Whereas the approach is evaluated on  datasets from the agricultural robotics domain the method is quite generic and widely applicable to many problems in computer graphics.
+
+
+Clarity of Exposition: The exposition is clear.
+
+
+Technical Soundness: The paper seems to be technically sound but I have not checked completely.
+
+
+Quality of References: The references are adequate.
+
+
+Reproducibility: The important details are discussed adequately,
+
+
+Explanation of Recommendation: The paper is well written and deals with a widely studied topic that is also very relevant for many topics in the direct focus of VMV. The proposed method has novelty, and the evaluation results show the merits of the methods so that the paper is worth publishing.
+
+
+-------------------- Review 3 --------------------
+
+Overall Recommendation: 4 (4 - dubious - not quite acceptable)
+Evaluation Confidence: 3 (3 - Moderately confident, I know as much as most)
+
+Summary: The authors present a new gradient-based query selection method for active learning in the domain of semantic segmentation. Unlike previous gradient-based methods, the expected gradient of the loss is estimated based on a coarse segmentation obtained with k-means. Two strategies are used to ensure a large variety in the selected samples, one based on selecting samples with a large range of gradient magnitudes, the other based on selecting samples with large range of gradient directions. The authors compare quantitatively to existing query selection methods.
+
+I would consider the k-means based gradient estimation approach to be the main contribution, and to a smaller extent the strategies used to encourage sample variety.
+    
+
+
+Clarity of Exposition: The exposition is generally clear, but could be improved in some parts:
+- In Section 3.2, second paragraph, the k-means computation and the human labeling is not described very clearly. Maybe an image of the labeling interface would help.
+- How is the loss for the pseudo-ground truth computed, given that the pseudo-ground truth only has two classes and the network outputs three classes? This should be clarified.
+    
+
+
+Technical Soundness: Seems ok.
+    
+
+
+Quality of References: Methods that use the expected gradient length (EGL) as query selection strategy are missing:
+- Settles et al., Multiple-Instance Active Learning, NeurIPS 2008
+- Active Learning for Speech Huang et al., Recognition: the Power of Gradients, NeurIPS 2016
+- Yuan et al., Gradient-based Active Learning Query Strategy for end-to-end speech recognition, ICASSP 2019
+These are very relevant to the current method, since they also use the gradient of the loss to do query selection.
+    
+
+
+Reproducibility: The work should be reproducible, the datasets are publicly available and a standard network architecture is used. Publishing the code would be appreciated.
+    
+
+
+Explanation of Recommendation: Using a separate source of labels to estimate the gradients used for query sample selection is an interesting approach that may well perform better than using the Estimated Gradient Length (EGL) used in previous work. However, the authors do not cite and do not compare to this previous work, making it hard judge the merit of this approach.
+
+Issues in order of importance:
+- The authors seem to have missed previous work on using the Estimated Gradient Length (EGL) for query sample selection. This means that using the gradient for sample selection is not a novel contribution of this method, however the approach to estimate the gradient is still novel. Nevertheless, methods that use EGL need to be cited, comparisons to EGL need to be included in the evaluation, and the claimed contributions need to be adjusted.
+- The results do not show a very clear advantage of the presented method over uncertainty-based query selection or loss-based query selection. Uncertainty-based selection seems to catch up after a single batch. Maybe decreasing the batch size so there are more data points at low sample sizes would help.
+- A quantitative evaluation of refining the model on the pseudo-gt would be helpful.
+- There are a few parts that could be clarified, see the 'Clarity of Exposition'.
+- Tables 2 and 3 would be clearer as a plot, similar to Figures 4 and 5.
+- In the text below Eq. 1, w should probably be w_f
